@@ -1,0 +1,18 @@
+{
+  "place": "Dhaka, Bangladesh",
+  "bbox_S_W_N_E": [
+    23.65,
+    90.32,
+    23.92,
+    90.52
+  ],
+  "n_stations": 248,
+  "data_lon_range": [
+    90.321594,
+    90.5185477
+  ],
+  "data_lat_range": [
+    23.6508265,
+    23.9191506
+  ]
+}

@@ -1,0 +1,3408 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_7bae3299d9db232215508f90f7e8d453 {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@main/folium/templates/leaflet_heat.min.js"></script>
+</head>
+<body>
+    
+    
+    <div style="position:fixed;bottom:20px;left:20px;z-index:9999;
+                background:#0f172aee;color:#e2e8f0;padding:14px 16px;border-radius:10px;
+                font:13px/1.5 Inter,system-ui;border:1px solid #334155;
+                box-shadow:0 6px 24px rgba(0,0,0,.3);max-width:240px;backdrop-filter:blur(8px)">
+      <div style="font-weight:700;font-size:13px;letter-spacing:.4px;color:#94a3b8;
+                  text-transform:uppercase;margin-bottom:8px">Legend</div>
+      <div style="font-weight:600;font-size:11px;color:#64748b;margin-top:8px">STATION LOAD</div>
+      <div><span style="display:inline-block;width:11px;height:11px;background:#22c55e;border-radius:50%;margin-right:6px"></span>&lt; 30%</div>
+      <div><span style="display:inline-block;width:11px;height:11px;background:#f59e0b;border-radius:50%;margin-right:6px"></span>30 – 70%</div>
+      <div><span style="display:inline-block;width:11px;height:11px;background:#ef4444;border-radius:50%;margin-right:6px"></span>&gt; 70%</div>
+      <div style="font-weight:600;font-size:11px;color:#64748b;margin-top:10px">VEHICLE CLASS</div>
+      <div><span style="display:inline-block;width:9px;height:9px;background:#3b82f6;border-radius:50%;margin-right:6px"></span>motorcycle</div>
+      <div><span style="display:inline-block;width:9px;height:9px;background:#a855f7;border-radius:50%;margin-right:6px"></span>car</div>
+      <div><span style="display:inline-block;width:9px;height:9px;background:#10b981;border-radius:50%;margin-right:6px"></span>three-wheeler</div>
+      <div><span style="display:inline-block;width:9px;height:9px;background:#ef4444;border-radius:50%;margin-right:6px"></span>emergency</div>
+    </div>
+    <div style='position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;background:#0f172aee;color:#fff;padding:10px 22px;border-radius:10px;font:600 15px/1.2 Inter,system-ui;border:1px solid #334155;box-shadow:0 6px 24px rgba(0,0,0,.3);backdrop-filter:blur(8px)'>Dhaka Fuel Allocation &middot; BT + MRV &middot; N = 80 vehicles, 18 stations, 6 slots</div>
+    
+            <div class="folium-map" id="map_7bae3299d9db232215508f90f7e8d453" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_7bae3299d9db232215508f90f7e8d453 = L.map(
+                "map_7bae3299d9db232215508f90f7e8d453",
+                {
+                    center: [23.7501941, 90.40394490555555],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_7bae3299d9db232215508f90f7e8d453);
+
+            
+
+        
+    
+            var tile_layer_c13b9fe2b7f97cb9cc4d950e387b882e = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; OpenStreetMap \u0026copy; CARTO",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_c13b9fe2b7f97cb9cc4d950e387b882e.addTo(map_7bae3299d9db232215508f90f7e8d453);
+        
+    
+            var tile_layer_072f111d5e787982efabb74e19e9793b = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; OSM \u0026copy; CARTO",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_072f111d5e787982efabb74e19e9793b.addTo(map_7bae3299d9db232215508f90f7e8d453);
+        
+    
+            var tile_layer_0d898a7b7dadb8e2f1f0d112e010bd0a = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 16,
+  "maxNativeZoom": 16,
+  "noWrap": false,
+  "attribution": "\u0026copy; Esri",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_0d898a7b7dadb8e2f1f0d112e010bd0a.addTo(map_7bae3299d9db232215508f90f7e8d453);
+        
+    
+            var feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var poly_line_2d23b4e9c558a7d047c266a693273752 = L.polyline(
+                [[23.90645922442258, 90.41044626509651], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_2d23b4e9c558a7d047c266a693273752.bindTooltip(
+                `<div>
+                     V015 &middot; motorcycle &rarr; S168 (slot 0) &middot; 1.29 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c80e43897310d8927b0b037970d0158f = L.circleMarker(
+                [23.90645922442258, 90.41044626509651],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_c80e43897310d8927b0b037970d0158f.bindTooltip(
+                `<div>
+                     V015 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_eca26a456fa308118789cadde5a701ba = L.polyline(
+                [[23.779897998867643, 90.36543612221209], [23.7794051, 90.3563644]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_eca26a456fa308118789cadde5a701ba.bindTooltip(
+                `<div>
+                     V017 &middot; car &rarr; S145 (slot 0) &middot; 0.92 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_adc673df818263e4ba2ffbb698e6dd37 = L.circleMarker(
+                [23.779897998867643, 90.36543612221209],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_adc673df818263e4ba2ffbb698e6dd37.bindTooltip(
+                `<div>
+                     V017 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_13db1eccce3c99f7460619ed3b33362c = L.polyline(
+                [[23.705178060992296, 90.370727250305], [23.7121866, 90.3909503]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_13db1eccce3c99f7460619ed3b33362c.bindTooltip(
+                `<div>
+                     V048 &middot; car &rarr; S161 (slot 0) &middot; 2.20 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bd553b22bef1125b3f8c5c83707684ab = L.circleMarker(
+                [23.705178060992296, 90.370727250305],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_bd553b22bef1125b3f8c5c83707684ab.bindTooltip(
+                `<div>
+                     V048 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_613dd989c0ec6011817bbd916ec25c5e = L.polyline(
+                [[23.73045917128933, 90.4228384570078], [23.7074926, 90.4349714]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_613dd989c0ec6011817bbd916ec25c5e.bindTooltip(
+                `<div>
+                     V061 &middot; three_wheeler &rarr; S150 (slot 0) &middot; 2.84 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a3ebdf2b4af980c0e5522d8c82897d56 = L.circleMarker(
+                [23.73045917128933, 90.4228384570078],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_a3ebdf2b4af980c0e5522d8c82897d56.bindTooltip(
+                `<div>
+                     V061 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d26d68b01fc14f03f21f500f9d547c5f = L.polyline(
+                [[23.72766604554155, 90.33951936761373], [23.7328023, 90.3625001]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_d26d68b01fc14f03f21f500f9d547c5f.bindTooltip(
+                `<div>
+                     V054 &middot; motorcycle &rarr; S159 (slot 0) &middot; 2.41 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_11b462d9e33754bb858f2968348ed566 = L.circleMarker(
+                [23.72766604554155, 90.33951936761373],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_11b462d9e33754bb858f2968348ed566.bindTooltip(
+                `<div>
+                     V054 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_70045fe042640c080164d65ecbab0e52 = L.polyline(
+                [[23.69930528608814, 90.43415778310916], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_70045fe042640c080164d65ecbab0e52.bindTooltip(
+                `<div>
+                     V043 &middot; motorcycle &rarr; S076 (slot 0) &middot; 2.07 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b6849de93806acc5496bfaf73ee74e3c = L.circleMarker(
+                [23.69930528608814, 90.43415778310916],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_b6849de93806acc5496bfaf73ee74e3c.bindTooltip(
+                `<div>
+                     V043 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_a88963f0885d3591f4e1d4007a22b9b5 = L.polyline(
+                [[23.75883442697668, 90.3841935782256], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_a88963f0885d3591f4e1d4007a22b9b5.bindTooltip(
+                `<div>
+                     V004 &middot; motorcycle &rarr; S045 (slot 0) &middot; 1.49 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_780d6a279bb2cebe1fccfca29ce4faf3 = L.circleMarker(
+                [23.75883442697668, 90.3841935782256],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_780d6a279bb2cebe1fccfca29ce4faf3.bindTooltip(
+                `<div>
+                     V004 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_71005e39eacee657024125f5a74ee16d = L.polyline(
+                [[23.718452342974498, 90.48602057609614], [23.6951999, 90.4959761]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_71005e39eacee657024125f5a74ee16d.bindTooltip(
+                `<div>
+                     V012 &middot; motorcycle &rarr; S202 (slot 0) &middot; 2.78 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a7286d3764e628ef47336b5d10217720 = L.circleMarker(
+                [23.718452342974498, 90.48602057609614],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_a7286d3764e628ef47336b5d10217720.bindTooltip(
+                `<div>
+                     V012 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_78803b7ed285df94754412be6c7aeb83 = L.polyline(
+                [[23.683374352424966, 90.39267203404114], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_78803b7ed285df94754412be6c7aeb83.bindTooltip(
+                `<div>
+                     V079 &middot; car &rarr; S073 (slot 0) &middot; 3.56 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d623ee0139a634aae48cc19ad7bed57a = L.circleMarker(
+                [23.683374352424966, 90.39267203404114],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_d623ee0139a634aae48cc19ad7bed57a.bindTooltip(
+                `<div>
+                     V079 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f53463c6f8919a2adf4380d6574cf933 = L.polyline(
+                [[23.67267744393017, 90.48361216781132], [23.668022, 90.4858851]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_f53463c6f8919a2adf4380d6574cf933.bindTooltip(
+                `<div>
+                     V022 &middot; motorcycle &rarr; S218 (slot 0) &middot; 0.57 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a255c45673d95189bc35b69706bb7b18 = L.circleMarker(
+                [23.67267744393017, 90.48361216781132],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_a255c45673d95189bc35b69706bb7b18.bindTooltip(
+                `<div>
+                     V022 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_09e610aac8f5319e07cfebe6b94c06bc = L.polyline(
+                [[23.734585250800937, 90.40624159973231], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_09e610aac8f5319e07cfebe6b94c06bc.bindTooltip(
+                `<div>
+                     V029 &middot; motorcycle &rarr; S076 (slot 0) &middot; 2.92 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_78d3b220eae9e02d66709bc526deea69 = L.circleMarker(
+                [23.734585250800937, 90.40624159973231],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_78d3b220eae9e02d66709bc526deea69.bindTooltip(
+                `<div>
+                     V029 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_31990bf19d663233b33cfd0b22ff2683 = L.polyline(
+                [[23.833193518383947, 90.34758639931574], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_31990bf19d663233b33cfd0b22ff2683.bindTooltip(
+                `<div>
+                     V052 &middot; three_wheeler &rarr; S045 (slot 0) &middot; 10.39 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_142475547f7198de2ac233cbf295fc70 = L.circleMarker(
+                [23.833193518383947, 90.34758639931574],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_142475547f7198de2ac233cbf295fc70.bindTooltip(
+                `<div>
+                     V052 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e3e4d06d01056a4e617eb4dd50347b52 = L.polyline(
+                [[23.867395912016146, 90.34995796303568], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_e3e4d06d01056a4e617eb4dd50347b52.bindTooltip(
+                `<div>
+                     V008 &middot; motorcycle &rarr; S168 (slot 0) &middot; 6.25 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0d9d522abdfe9e883755d5fff56cf177 = L.circleMarker(
+                [23.867395912016146, 90.34995796303568],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_0d9d522abdfe9e883755d5fff56cf177.bindTooltip(
+                `<div>
+                     V008 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5a72a5a6b7147b908e579a0cdef331dc = L.polyline(
+                [[23.8233611476478, 90.41662203976469], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_5a72a5a6b7147b908e579a0cdef331dc.bindTooltip(
+                `<div>
+                     V002 &middot; motorcycle &rarr; S073 (slot 0) &middot; 12.63 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8dec409845caca8dd2c56cd8e329f7c8 = L.circleMarker(
+                [23.8233611476478, 90.41662203976469],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_8dec409845caca8dd2c56cd8e329f7c8.bindTooltip(
+                `<div>
+                     V002 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_5a581b5b1da303d9513883a5ab2ad6de = L.polyline(
+                [[23.796194348542432, 90.49128797046582], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            poly_line_5a581b5b1da303d9513883a5ab2ad6de.bindTooltip(
+                `<div>
+                     V005 &middot; car &rarr; S073 (slot 0) &middot; 12.52 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_902362f39c7632ced03a4dc2cc5d84ad = L.circleMarker(
+                [23.796194348542432, 90.49128797046582],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926);
+        
+    
+            circle_marker_902362f39c7632ced03a4dc2cc5d84ad.bindTooltip(
+                `<div>
+                     V005 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926.addTo(map_7bae3299d9db232215508f90f7e8d453);
+        
+    
+            var feature_group_ceb9a3c7d5f6b78409313b129bbe73d7 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var poly_line_48e2d96180586e49d94ae40300b6242a = L.polyline(
+                [[23.873992181212305, 90.42227387952937], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_48e2d96180586e49d94ae40300b6242a.bindTooltip(
+                `<div>
+                     V006 &middot; car &rarr; S168 (slot 1) &middot; 3.78 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_017363aad832902792eda6692248eef9 = L.circleMarker(
+                [23.873992181212305, 90.42227387952937],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_017363aad832902792eda6692248eef9.bindTooltip(
+                `<div>
+                     V006 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8170b361ecdfd69df71843f94d11f676 = L.polyline(
+                [[23.807655516857633, 90.4092821057593], [23.8061746, 90.3740504]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_8170b361ecdfd69df71843f94d11f676.bindTooltip(
+                `<div>
+                     V039 &middot; motorcycle &rarr; S116 (slot 1) &middot; 3.59 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5eb247e27cd9818fbda4c115d9a3f585 = L.circleMarker(
+                [23.807655516857633, 90.4092821057593],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_5eb247e27cd9818fbda4c115d9a3f585.bindTooltip(
+                `<div>
+                     V039 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e24cd43532ddb0aa31dfdde12e84d27c = L.polyline(
+                [[23.887555700452904, 90.38256817033758], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_e24cd43532ddb0aa31dfdde12e84d27c.bindTooltip(
+                `<div>
+                     V058 &middot; motorcycle &rarr; S168 (slot 1) &middot; 2.25 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8f28a43ace7a0d5ba4591e5c4853ad5f = L.circleMarker(
+                [23.887555700452904, 90.38256817033758],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_8f28a43ace7a0d5ba4591e5c4853ad5f.bindTooltip(
+                `<div>
+                     V058 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bd7c6fd8346305234ae0d47201af6520 = L.polyline(
+                [[23.803125817653374, 90.3767632381181], [23.8061746, 90.3740504]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_bd7c6fd8346305234ae0d47201af6520.bindTooltip(
+                `<div>
+                     V042 &middot; car &rarr; S116 (slot 1) &middot; 0.44 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5ca639f0c9bbb1fd7593310876603f56 = L.circleMarker(
+                [23.803125817653374, 90.3767632381181],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_5ca639f0c9bbb1fd7593310876603f56.bindTooltip(
+                `<div>
+                     V042 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d3759d152495b46c83c0434593ba5af1 = L.polyline(
+                [[23.81887188924385, 90.36151734903873], [23.7794051, 90.3563644]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_d3759d152495b46c83c0434593ba5af1.bindTooltip(
+                `<div>
+                     V028 &middot; motorcycle &rarr; S145 (slot 1) &middot; 4.42 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_65ec7adaae96164c253a0d558c19209e = L.circleMarker(
+                [23.81887188924385, 90.36151734903873],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_65ec7adaae96164c253a0d558c19209e.bindTooltip(
+                `<div>
+                     V028 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9ebf5792bed974ceb9b6b787afa366e5 = L.polyline(
+                [[23.78937101841764, 90.34015014274219], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_9ebf5792bed974ceb9b6b787afa366e5.bindTooltip(
+                `<div>
+                     V020 &middot; car &rarr; S247 (slot 1) &middot; 1.44 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2d454f5e8662069f5f6801bc09ce4691 = L.circleMarker(
+                [23.78937101841764, 90.34015014274219],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_2d454f5e8662069f5f6801bc09ce4691.bindTooltip(
+                `<div>
+                     V020 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_924ca3b00fbeb568a6c7744c2c523576 = L.polyline(
+                [[23.706261825947312, 90.44025774302004], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_924ca3b00fbeb568a6c7744c2c523576.bindTooltip(
+                `<div>
+                     V016 &middot; motorcycle &rarr; S076 (slot 1) &middot; 2.32 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0a5d6b08855f971ff1d69cc4bbf32794 = L.circleMarker(
+                [23.706261825947312, 90.44025774302004],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_0a5d6b08855f971ff1d69cc4bbf32794.bindTooltip(
+                `<div>
+                     V016 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_111e4f678da16178e99d498443379eed = L.polyline(
+                [[23.71418500215886, 90.37883700839996], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_111e4f678da16178e99d498443379eed.bindTooltip(
+                `<div>
+                     V059 &middot; motorcycle &rarr; S076 (slot 1) &middot; 4.00 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9a4a628156c333876014a180abfdad10 = L.circleMarker(
+                [23.71418500215886, 90.37883700839996],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_9a4a628156c333876014a180abfdad10.bindTooltip(
+                `<div>
+                     V059 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_74c84086be6390f59a8aa473801def22 = L.polyline(
+                [[23.71345573113843, 90.32933421696063], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_74c84086be6390f59a8aa473801def22.bindTooltip(
+                `<div>
+                     V063 &middot; three_wheeler &rarr; S045 (slot 1) &middot; 7.96 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8c37bf27bfabc70ca14b7d3b3ac60f30 = L.circleMarker(
+                [23.71345573113843, 90.32933421696063],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_8c37bf27bfabc70ca14b7d3b3ac60f30.bindTooltip(
+                `<div>
+                     V063 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6c9e8aa81c349b30f67ac8b2bc4e534d = L.polyline(
+                [[23.881478453129173, 90.33564530115542], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_6c9e8aa81c349b30f67ac8b2bc4e534d.bindTooltip(
+                `<div>
+                     V078 &middot; motorcycle &rarr; S247 (slot 1) &middot; 10.39 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b2b6bea40b84aa7228a58b957adc0624 = L.circleMarker(
+                [23.881478453129173, 90.33564530115542],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_b2b6bea40b84aa7228a58b957adc0624.bindTooltip(
+                `<div>
+                     V078 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_fa50985444643b7c2958ae52e3648470 = L.polyline(
+                [[23.853505999657273, 90.36153588379005], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_fa50985444643b7c2958ae52e3648470.bindTooltip(
+                `<div>
+                     V011 &middot; car &rarr; S073 (slot 1) &middot; 16.79 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1aac504e3d1224fd55dd185402a6ad5e = L.circleMarker(
+                [23.853505999657273, 90.36153588379005],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_1aac504e3d1224fd55dd185402a6ad5e.bindTooltip(
+                `<div>
+                     V011 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_70845738489f98187a446dadfd0b8e39 = L.polyline(
+                [[23.762588231656547, 90.48107472924889], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_70845738489f98187a446dadfd0b8e39.bindTooltip(
+                `<div>
+                     V013 &middot; car &rarr; S073 (slot 1) &middot; 9.13 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_638da40978beaaa4331f8392c2788f18 = L.circleMarker(
+                [23.762588231656547, 90.48107472924889],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_638da40978beaaa4331f8392c2788f18.bindTooltip(
+                `<div>
+                     V013 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_70ec69b1a508124b8f12f7946d948875 = L.polyline(
+                [[23.776473671884304, 90.48792242445457], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_70ec69b1a508124b8f12f7946d948875.bindTooltip(
+                `<div>
+                     V019 &middot; motorcycle &rarr; S073 (slot 1) &middot; 10.68 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7cd5c81ed20c849a0f94ee7c0d3ab5f3 = L.circleMarker(
+                [23.776473671884304, 90.48792242445457],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_7cd5c81ed20c849a0f94ee7c0d3ab5f3.bindTooltip(
+                `<div>
+                     V019 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b52021d15420a3633b35a082e3e63aab = L.polyline(
+                [[23.82670019430587, 90.42958199968677], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            poly_line_b52021d15420a3633b35a082e3e63aab.bindTooltip(
+                `<div>
+                     V069 &middot; motorcycle &rarr; S045 (slot 1) &middot; 9.09 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d5e5e02b0b33a6f571b61956659fa689 = L.circleMarker(
+                [23.82670019430587, 90.42958199968677],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_ceb9a3c7d5f6b78409313b129bbe73d7);
+        
+    
+            circle_marker_d5e5e02b0b33a6f571b61956659fa689.bindTooltip(
+                `<div>
+                     V069 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var feature_group_0dabb6153cb7437f794c15b38b46e92a = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var poly_line_ecac72649a0b3099415496ba1825233a = L.polyline(
+                [[23.72005813140417, 90.33179243927515], [23.7328023, 90.3625001]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_ecac72649a0b3099415496ba1825233a.bindTooltip(
+                `<div>
+                     V038 &middot; motorcycle &rarr; S159 (slot 2) &middot; 3.43 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fa80e1f4003734410bbf63e39a1d6fc6 = L.circleMarker(
+                [23.72005813140417, 90.33179243927515],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_fa80e1f4003734410bbf63e39a1d6fc6.bindTooltip(
+                `<div>
+                     V038 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1bf3fa9002a906b706af9aba699adf1f = L.polyline(
+                [[23.89279317868722, 90.43970612566434], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_1bf3fa9002a906b706af9aba699adf1f.bindTooltip(
+                `<div>
+                     V066 &middot; motorcycle &rarr; S168 (slot 2) &middot; 4.20 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8c73393fb1a970058cc6b7bab0e9af22 = L.circleMarker(
+                [23.89279317868722, 90.43970612566434],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_8c73393fb1a970058cc6b7bab0e9af22.bindTooltip(
+                `<div>
+                     V066 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_df50567f44d7949f9c78b1a8d96974d3 = L.polyline(
+                [[23.87983158359544, 90.42198070034789], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_df50567f44d7949f9c78b1a8d96974d3.bindTooltip(
+                `<div>
+                     V071 &middot; motorcycle &rarr; S168 (slot 2) &middot; 3.28 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_95e057487abea372cffc6fe3375b958e = L.circleMarker(
+                [23.87983158359544, 90.42198070034789],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_95e057487abea372cffc6fe3375b958e.bindTooltip(
+                `<div>
+                     V071 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_914e6b1d7252093ab456ae5d9b5b2280 = L.polyline(
+                [[23.827426609918195, 90.37847445993313], [23.8061746, 90.3740504]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_914e6b1d7252093ab456ae5d9b5b2280.bindTooltip(
+                `<div>
+                     V065 &middot; motorcycle &rarr; S116 (slot 2) &middot; 2.41 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4fa6cbfe4130eca93643959742e0d140 = L.circleMarker(
+                [23.827426609918195, 90.37847445993313],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_4fa6cbfe4130eca93643959742e0d140.bindTooltip(
+                `<div>
+                     V065 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e300aa4d5c213db4bcc0f8624167c3d5 = L.polyline(
+                [[23.82857251287711, 90.38671185141412], [23.8061746, 90.3740504]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_e300aa4d5c213db4bcc0f8624167c3d5.bindTooltip(
+                `<div>
+                     V026 &middot; motorcycle &rarr; S116 (slot 2) &middot; 2.80 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0ca3b0afb0eecdbdf58588cdfa6ea663 = L.circleMarker(
+                [23.82857251287711, 90.38671185141412],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_0ca3b0afb0eecdbdf58588cdfa6ea663.bindTooltip(
+                `<div>
+                     V026 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c5698993930360a0e2411bcef045dac5 = L.polyline(
+                [[23.796371762802227, 90.36812353695683], [23.7794051, 90.3563644]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_c5698993930360a0e2411bcef045dac5.bindTooltip(
+                `<div>
+                     V018 &middot; car &rarr; S145 (slot 2) &middot; 2.23 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e6a994fee8ad766061fd2175fc3c4c34 = L.circleMarker(
+                [23.796371762802227, 90.36812353695683],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_e6a994fee8ad766061fd2175fc3c4c34.bindTooltip(
+                `<div>
+                     V018 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_65b9e2d206b8a8219d618d3992a0c044 = L.polyline(
+                [[23.770752112875698, 90.32888820412809], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_65b9e2d206b8a8219d618d3992a0c044.bindTooltip(
+                `<div>
+                     V053 &middot; car &rarr; S247 (slot 2) &middot; 1.99 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_de6da33a1132479a0ebb2c1381747fa4 = L.circleMarker(
+                [23.770752112875698, 90.32888820412809],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_de6da33a1132479a0ebb2c1381747fa4.bindTooltip(
+                `<div>
+                     V053 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_a8edd2bacb1f93ac86347d2ba2f710f4 = L.polyline(
+                [[23.802203467362855, 90.36741143345161], [23.7826729, 90.3470612]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_a8edd2bacb1f93ac86347d2ba2f710f4.bindTooltip(
+                `<div>
+                     V014 &middot; motorcycle &rarr; S083 (slot 2) &middot; 3.00 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_04f23029a58aee162f10633b1ab2e0c5 = L.circleMarker(
+                [23.802203467362855, 90.36741143345161],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_04f23029a58aee162f10633b1ab2e0c5.bindTooltip(
+                `<div>
+                     V014 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4eb0c7a083e678a844c66e821458e980 = L.polyline(
+                [[23.795352518336728, 90.343524382096], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#ef4444", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#ef4444", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_4eb0c7a083e678a844c66e821458e980.bindTooltip(
+                `<div>
+                     V024 &middot; emergency &rarr; S247 (slot 2) &middot; 1.94 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_458cffcb769eb9407f58591ec9fdb6bc = L.circleMarker(
+                [23.795352518336728, 90.343524382096],
+                {"bubblingMouseEvents": true, "color": "#ef4444", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_458cffcb769eb9407f58591ec9fdb6bc.bindTooltip(
+                `<div>
+                     V024 &middot; emergency
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_fa6e6860298c21620ba9507e2efba485 = L.polyline(
+                [[23.70618469582444, 90.39529038624025], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_fa6e6860298c21620ba9507e2efba485.bindTooltip(
+                `<div>
+                     V003 &middot; car &rarr; S076 (slot 2) &middot; 2.36 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0a768c331a228b7004926856401a0ae0 = L.circleMarker(
+                [23.70618469582444, 90.39529038624025],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_0a768c331a228b7004926856401a0ae0.bindTooltip(
+                `<div>
+                     V003 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_a71773a0943040fb0681ad434b66aeb7 = L.polyline(
+                [[23.725207933994984, 90.39829990654597], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_a71773a0943040fb0681ad434b66aeb7.bindTooltip(
+                `<div>
+                     V077 &middot; motorcycle &rarr; S076 (slot 2) &middot; 2.58 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d8a8ea7ad876383d3c95de75aa09cc5b = L.circleMarker(
+                [23.725207933994984, 90.39829990654597],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_d8a8ea7ad876383d3c95de75aa09cc5b.bindTooltip(
+                `<div>
+                     V077 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_fd93b299a93b6f84b4be98adbaa0a567 = L.polyline(
+                [[23.870882176874968, 90.35059568072045], [23.7074926, 90.4349714]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_fd93b299a93b6f84b4be98adbaa0a567.bindTooltip(
+                `<div>
+                     V035 &middot; three_wheeler &rarr; S150 (slot 2) &middot; 20.09 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_967ade2f3acf0aecaee18325786c363a = L.circleMarker(
+                [23.870882176874968, 90.35059568072045],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_967ade2f3acf0aecaee18325786c363a.bindTooltip(
+                `<div>
+                     V035 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_8c8b97646ec85ab7977cf19966ab96a4 = L.polyline(
+                [[23.877888946857425, 90.4867250328649], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_8c8b97646ec85ab7977cf19966ab96a4.bindTooltip(
+                `<div>
+                     V023 &middot; motorcycle &rarr; S073 (slot 2) &middot; 20.16 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6970cc58753df9c7ffbf4365ea0fb420 = L.circleMarker(
+                [23.877888946857425, 90.4867250328649],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_6970cc58753df9c7ffbf4365ea0fb420.bindTooltip(
+                `<div>
+                     V023 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_cd1b9fc354c79e2d93f2a8be7d921194 = L.polyline(
+                [[23.81301359640142, 90.48976162871168], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_cd1b9fc354c79e2d93f2a8be7d921194.bindTooltip(
+                `<div>
+                     V025 &middot; motorcycle &rarr; S073 (slot 2) &middot; 13.91 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_5a2232514c9bb0af3f823855a778e651 = L.circleMarker(
+                [23.81301359640142, 90.48976162871168],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_5a2232514c9bb0af3f823855a778e651.bindTooltip(
+                `<div>
+                     V025 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_111e3910a0284fd566fc75a40ab72416 = L.polyline(
+                [[23.7796529448972, 90.4487317776881], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_111e3910a0284fd566fc75a40ab72416.bindTooltip(
+                `<div>
+                     V031 &middot; motorcycle &rarr; S073 (slot 2) &middot; 8.60 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_53800506aea167c41caf37a581c0df39 = L.circleMarker(
+                [23.7796529448972, 90.4487317776881],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_53800506aea167c41caf37a581c0df39.bindTooltip(
+                `<div>
+                     V031 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_677e03741ffc3b9a41601617410b224c = L.polyline(
+                [[23.715619191473916, 90.32585335040513], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_677e03741ffc3b9a41601617410b224c.bindTooltip(
+                `<div>
+                     V070 &middot; motorcycle &rarr; S045 (slot 2) &middot; 8.15 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_82e242e992f4df6126441a042fe669d0 = L.circleMarker(
+                [23.715619191473916, 90.32585335040513],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_82e242e992f4df6126441a042fe669d0.bindTooltip(
+                `<div>
+                     V070 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_06a3b518625d541f07cec53e12a681f0 = L.polyline(
+                [[23.86022500165967, 90.4429485569848], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            poly_line_06a3b518625d541f07cec53e12a681f0.bindTooltip(
+                `<div>
+                     V073 &middot; motorcycle &rarr; S045 (slot 2) &middot; 13.06 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_fc167eb8a13de5cb72971374af1c0fd7 = L.circleMarker(
+                [23.86022500165967, 90.4429485569848],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_0dabb6153cb7437f794c15b38b46e92a);
+        
+    
+            circle_marker_fc167eb8a13de5cb72971374af1c0fd7.bindTooltip(
+                `<div>
+                     V073 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var feature_group_272a06f1597ec852ea9cc09ee11a9361 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var poly_line_dfe5c2b459e3a05734b470543c3deb79 = L.polyline(
+                [[23.844079912112836, 90.37952119948999], [23.8061746, 90.3740504]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_dfe5c2b459e3a05734b470543c3deb79.bindTooltip(
+                `<div>
+                     V056 &middot; motorcycle &rarr; S116 (slot 3) &middot; 4.25 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_72434e5d9416594aeed8a9aef25cfbe3 = L.circleMarker(
+                [23.844079912112836, 90.37952119948999],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_72434e5d9416594aeed8a9aef25cfbe3.bindTooltip(
+                `<div>
+                     V056 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_4209113a72dc48d22492d92feb5da178 = L.polyline(
+                [[23.72460833022599, 90.34993139940069], [23.7328023, 90.3625001]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_4209113a72dc48d22492d92feb5da178.bindTooltip(
+                `<div>
+                     V055 &middot; three_wheeler &rarr; S159 (slot 3) &middot; 1.57 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ac6a6fa1c9710d89e399fa0f6cc44b60 = L.circleMarker(
+                [23.72460833022599, 90.34993139940069],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_ac6a6fa1c9710d89e399fa0f6cc44b60.bindTooltip(
+                `<div>
+                     V055 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f1e32f9a02f38120e3bcfc6a959bf118 = L.polyline(
+                [[23.78148143700118, 90.36679236652358], [23.7794051, 90.3563644]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_f1e32f9a02f38120e3bcfc6a959bf118.bindTooltip(
+                `<div>
+                     V076 &middot; car &rarr; S145 (slot 3) &middot; 1.09 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_af2950d6f5ebc645e409349dbdfa6e5c = L.circleMarker(
+                [23.78148143700118, 90.36679236652358],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_af2950d6f5ebc645e409349dbdfa6e5c.bindTooltip(
+                `<div>
+                     V076 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_6421a8f4bb4a0154141a0219e8ffe5e1 = L.polyline(
+                [[23.703295358817524, 90.44150304040005], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_6421a8f4bb4a0154141a0219e8ffe5e1.bindTooltip(
+                `<div>
+                     V072 &middot; motorcycle &rarr; S076 (slot 3) &middot; 2.53 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c78466fcc40e3f89f8978df66b48df28 = L.circleMarker(
+                [23.703295358817524, 90.44150304040005],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_c78466fcc40e3f89f8978df66b48df28.bindTooltip(
+                `<div>
+                     V072 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9561fb162104eb3f626b5f4bef99d94e = L.polyline(
+                [[23.711880374544474, 90.4022680540867], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_9561fb162104eb3f626b5f4bef99d94e.bindTooltip(
+                `<div>
+                     V033 &middot; motorcycle &rarr; S076 (slot 3) &middot; 1.60 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_22d76cf6853d4fec78a9d85802d79cea = L.circleMarker(
+                [23.711880374544474, 90.4022680540867],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_22d76cf6853d4fec78a9d85802d79cea.bindTooltip(
+                `<div>
+                     V033 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c5d6ebb216757ab0dd6e53a50c34ea09 = L.polyline(
+                [[23.822919176386876, 90.42781554394332], [23.7074926, 90.4349714]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_c5d6ebb216757ab0dd6e53a50c34ea09.bindTooltip(
+                `<div>
+                     V009 &middot; three_wheeler &rarr; S150 (slot 3) &middot; 12.86 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b170cd5e358056f5d0c08ad5cb03b05c = L.circleMarker(
+                [23.822919176386876, 90.42781554394332],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_b170cd5e358056f5d0c08ad5cb03b05c.bindTooltip(
+                `<div>
+                     V009 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_904e7bd5ca26c0f31f480c15f08c542a = L.polyline(
+                [[23.872620171245767, 90.33866752963213], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_904e7bd5ca26c0f31f480c15f08c542a.bindTooltip(
+                `<div>
+                     V034 &middot; car &rarr; S247 (slot 3) &middot; 9.44 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e89d2fccc6e432265ab55abe47d2e4ee = L.circleMarker(
+                [23.872620171245767, 90.33866752963213],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_e89d2fccc6e432265ab55abe47d2e4ee.bindTooltip(
+                `<div>
+                     V034 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_05ade600fed08bb6332ebd5f710382eb = L.polyline(
+                [[23.866257590540666, 90.32928194210473], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_05ade600fed08bb6332ebd5f710382eb.bindTooltip(
+                `<div>
+                     V050 &middot; car &rarr; S247 (slot 3) &middot; 8.66 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_890b9c02ced7c3215ed56b2efe2abf04 = L.circleMarker(
+                [23.866257590540666, 90.32928194210473],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_890b9c02ced7c3215ed56b2efe2abf04.bindTooltip(
+                `<div>
+                     V050 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_730856f2c61abfe181c5ec5d9a263b88 = L.polyline(
+                [[23.749124076696617, 90.47185426640152], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_730856f2c61abfe181c5ec5d9a263b88.bindTooltip(
+                `<div>
+                     V032 &middot; motorcycle &rarr; S073 (slot 3) &middot; 7.46 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8718e86349d40fcd0e64ee550f4f23d1 = L.circleMarker(
+                [23.749124076696617, 90.47185426640152],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_8718e86349d40fcd0e64ee550f4f23d1.bindTooltip(
+                `<div>
+                     V032 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_2999bbe7b1b0f620ced6f79dc2f69a49 = L.polyline(
+                [[23.751444115984462, 90.33358997380755], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_2999bbe7b1b0f620ced6f79dc2f69a49.bindTooltip(
+                `<div>
+                     V045 &middot; motorcycle &rarr; S073 (slot 3) &middot; 9.26 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_612052fa501c2047550806b12c424f9b = L.circleMarker(
+                [23.751444115984462, 90.33358997380755],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_612052fa501c2047550806b12c424f9b.bindTooltip(
+                `<div>
+                     V045 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_e49b8b01706a5c8b8b711f1064ad38ec = L.polyline(
+                [[23.82658901830574, 90.48532658583781], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_e49b8b01706a5c8b8b711f1064ad38ec.bindTooltip(
+                `<div>
+                     V047 &middot; motorcycle &rarr; S073 (slot 3) &middot; 14.95 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8600e0028e441843321837f37a16d4fa = L.circleMarker(
+                [23.82658901830574, 90.48532658583781],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_8600e0028e441843321837f37a16d4fa.bindTooltip(
+                `<div>
+                     V047 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b33b0262d40b8280007cde263fc64883 = L.polyline(
+                [[23.859581244359948, 90.43800760692164], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_b33b0262d40b8280007cde263fc64883.bindTooltip(
+                `<div>
+                     V074 &middot; motorcycle &rarr; S045 (slot 3) &middot; 12.82 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_07a293f87871e782b33176282a330793 = L.circleMarker(
+                [23.859581244359948, 90.43800760692164],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_07a293f87871e782b33176282a330793.bindTooltip(
+                `<div>
+                     V074 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_bd24d6b236d9997a6d8b55daf4c5430c = L.polyline(
+                [[23.839947034013157, 90.40961827641623], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            poly_line_bd24d6b236d9997a6d8b55daf4c5430c.bindTooltip(
+                `<div>
+                     V075 &middot; car &rarr; S045 (slot 3) &middot; 10.00 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_35014aade10985df5f8a38cda63ae289 = L.circleMarker(
+                [23.839947034013157, 90.40961827641623],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_272a06f1597ec852ea9cc09ee11a9361);
+        
+    
+            circle_marker_35014aade10985df5f8a38cda63ae289.bindTooltip(
+                `<div>
+                     V075 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var feature_group_49454194add8d24865a50f8fb2ef5620 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var poly_line_af044144d9b4c40c4fee271fca9f557a = L.polyline(
+                [[23.768872200487728, 90.32679010169977], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_af044144d9b4c40c4fee271fca9f557a.bindTooltip(
+                `<div>
+                     V001 &middot; motorcycle &rarr; S247 (slot 4) &middot; 2.18 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_395ed164acd4300a73bb5fa78a0ebb7a = L.circleMarker(
+                [23.768872200487728, 90.32679010169977],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_395ed164acd4300a73bb5fa78a0ebb7a.bindTooltip(
+                `<div>
+                     V001 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_56c2a961e145becf51bb3bfad0c80427 = L.polyline(
+                [[23.706636387510127, 90.48786728834529], [23.668022, 90.4858851]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_56c2a961e145becf51bb3bfad0c80427.bindTooltip(
+                `<div>
+                     V021 &middot; motorcycle &rarr; S218 (slot 4) &middot; 4.30 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_072c6f7b13bca72433ce5015c38b672e = L.circleMarker(
+                [23.706636387510127, 90.48786728834529],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_072c6f7b13bca72433ce5015c38b672e.bindTooltip(
+                `<div>
+                     V021 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_831fe2f032247d40cd4a43d3881ee96f = L.polyline(
+                [[23.7073745196527, 90.32196985940323], [23.7074926, 90.4349714]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_831fe2f032247d40cd4a43d3881ee96f.bindTooltip(
+                `<div>
+                     V036 &middot; three_wheeler &rarr; S150 (slot 4) &middot; 11.50 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ebdc3a9e6b8a99dc8b7d50dcafc54dd3 = L.circleMarker(
+                [23.7073745196527, 90.32196985940323],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_ebdc3a9e6b8a99dc8b7d50dcafc54dd3.bindTooltip(
+                `<div>
+                     V036 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_56246c8903e6a372d5bf7fb57bc11bbb = L.polyline(
+                [[23.674000215775703, 90.36955419009878], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_56246c8903e6a372d5bf7fb57bc11bbb.bindTooltip(
+                `<div>
+                     V000 &middot; car &rarr; S247 (slot 4) &middot; 13.48 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_11c1fc007a34a5ba16288b5924178d99 = L.circleMarker(
+                [23.674000215775703, 90.36955419009878],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_11c1fc007a34a5ba16288b5924178d99.bindTooltip(
+                `<div>
+                     V000 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_121a4778bfe4a6375bc803f692924bff = L.polyline(
+                [[23.732546495255374, 90.48296565722382], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_121a4778bfe4a6375bc803f692924bff.bindTooltip(
+                `<div>
+                     V010 &middot; motorcycle &rarr; S168 (slot 4) &middot; 20.55 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_422cad0c52d1806de6b57840dadab89f = L.circleMarker(
+                [23.732546495255374, 90.48296565722382],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_422cad0c52d1806de6b57840dadab89f.bindTooltip(
+                `<div>
+                     V010 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_3d55267770f4ac964a8310dffc17443b = L.polyline(
+                [[23.86103461588877, 90.35479808072725], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_3d55267770f4ac964a8310dffc17443b.bindTooltip(
+                `<div>
+                     V030 &middot; car &rarr; S168 (slot 4) &middot; 6.33 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e42fb1764f10ef1bbe8eaca83cdb0620 = L.circleMarker(
+                [23.86103461588877, 90.35479808072725],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_e42fb1764f10ef1bbe8eaca83cdb0620.bindTooltip(
+                `<div>
+                     V030 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_510cd6802b4b34a03caf805983d54dc4 = L.polyline(
+                [[23.871890168029303, 90.40972829291015], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_510cd6802b4b34a03caf805983d54dc4.bindTooltip(
+                `<div>
+                     V049 &middot; car &rarr; S073 (slot 4) &middot; 18.02 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_63be421ce61161ce7d0c1fa7d657d530 = L.circleMarker(
+                [23.871890168029303, 90.40972829291015],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_63be421ce61161ce7d0c1fa7d657d530.bindTooltip(
+                `<div>
+                     V049 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_dcc78f5504f516a8642a28c100e1679f = L.polyline(
+                [[23.77363208669095, 90.44464977126763], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_dcc78f5504f516a8642a28c100e1679f.bindTooltip(
+                `<div>
+                     V051 &middot; motorcycle &rarr; S073 (slot 4) &middot; 7.82 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_431f2e571cc78b90a561c2b1ee0f2670 = L.circleMarker(
+                [23.77363208669095, 90.44464977126763],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_431f2e571cc78b90a561c2b1ee0f2670.bindTooltip(
+                `<div>
+                     V051 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_76f628471ca1bfabc0d1d442e20fdb5b = L.polyline(
+                [[23.835645579942693, 90.38830242892408], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_76f628471ca1bfabc0d1d442e20fdb5b.bindTooltip(
+                `<div>
+                     V057 &middot; motorcycle &rarr; S073 (slot 4) &middot; 14.20 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_34e7cc5ac7da34fb391070c77a350030 = L.circleMarker(
+                [23.835645579942693, 90.38830242892408],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_34e7cc5ac7da34fb391070c77a350030.bindTooltip(
+                `<div>
+                     V057 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_d44161f8b5d766b5c3959cab3778068c = L.polyline(
+                [[23.683325841090124, 90.32526199843198], [23.750901, 90.3960067]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            poly_line_d44161f8b5d766b5c3959cab3778068c.bindTooltip(
+                `<div>
+                     V027 &middot; motorcycle &rarr; S045 (slot 4) &middot; 10.41 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0ebaed2a1de1577f6b39d24443a34814 = L.circleMarker(
+                [23.683325841090124, 90.32526199843198],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_49454194add8d24865a50f8fb2ef5620);
+        
+    
+            circle_marker_0ebaed2a1de1577f6b39d24443a34814.bindTooltip(
+                `<div>
+                     V027 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var feature_group_8db147a94ec521c9747e8136932c4127 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var poly_line_0f719c5013195a6ce474f04d4cc1c9dc = L.polyline(
+                [[23.797865108003947, 90.37434757467867], [23.7794051, 90.3563644]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_0f719c5013195a6ce474f04d4cc1c9dc.bindTooltip(
+                `<div>
+                     V046 &middot; motorcycle &rarr; S145 (slot 5) &middot; 2.75 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ac7342a66cf1be1cec0966483d313bb8 = L.circleMarker(
+                [23.797865108003947, 90.37434757467867],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_ac7342a66cf1be1cec0966483d313bb8.bindTooltip(
+                `<div>
+                     V046 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_ce65cb0c4230ad8c88bcf2e2a566204d = L.polyline(
+                [[23.687170707068304, 90.35399854692824], [23.7074926, 90.4349714]],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#10b981", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_ce65cb0c4230ad8c88bcf2e2a566204d.bindTooltip(
+                `<div>
+                     V040 &middot; three_wheeler &rarr; S150 (slot 5) &middot; 8.55 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_784569da168195ad4ad6e2b3ccf0cc55 = L.circleMarker(
+                [23.687170707068304, 90.35399854692824],
+                {"bubblingMouseEvents": true, "color": "#10b981", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#10b981", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_784569da168195ad4ad6e2b3ccf0cc55.bindTooltip(
+                `<div>
+                     V040 &middot; three_wheeler
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_9106a7c7c5bcc47716b5dec3724e002e = L.polyline(
+                [[23.668119030060897, 90.37162661646641], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_9106a7c7c5bcc47716b5dec3724e002e.bindTooltip(
+                `<div>
+                     V067 &middot; motorcycle &rarr; S247 (slot 5) &middot; 14.16 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4b80b4f4235941aee6ea7ac58ad83260 = L.circleMarker(
+                [23.668119030060897, 90.37162661646641],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_4b80b4f4235941aee6ea7ac58ad83260.bindTooltip(
+                `<div>
+                     V067 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b8d37038b94fdfb9f76592b7bc06bdb9 = L.polyline(
+                [[23.903515362153154, 90.47074610035783], [23.7884774, 90.3260413]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_b8d37038b94fdfb9f76592b7bc06bdb9.bindTooltip(
+                `<div>
+                     V007 &middot; car &rarr; S247 (slot 5) &middot; 19.50 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cadb5e394a45b313eec063c01df680e7 = L.circleMarker(
+                [23.903515362153154, 90.47074610035783],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_cadb5e394a45b313eec063c01df680e7.bindTooltip(
+                `<div>
+                     V007 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_f2ec15527d1700c07d41bb511801d842 = L.polyline(
+                [[23.896845614960597, 90.49517789898138], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_f2ec15527d1700c07d41bb511801d842.bindTooltip(
+                `<div>
+                     V037 &middot; motorcycle &rarr; S168 (slot 5) &middot; 9.75 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8baec8888b5f2d145cf7c08b41a70485 = L.circleMarker(
+                [23.896845614960597, 90.49517789898138],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_8baec8888b5f2d145cf7c08b41a70485.bindTooltip(
+                `<div>
+                     V037 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_b5e27ce685337d2ab3e1d3ae910d7dcb = L.polyline(
+                [[23.88082363748964, 90.3645295493996], [23.900798, 90.3993377]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_b5e27ce685337d2ab3e1d3ae910d7dcb.bindTooltip(
+                `<div>
+                     V041 &middot; motorcycle &rarr; S168 (slot 5) &middot; 4.18 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7fc2e11994308af8fe62fd4a1f4499dc = L.circleMarker(
+                [23.88082363748964, 90.3645295493996],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_7fc2e11994308af8fe62fd4a1f4499dc.bindTooltip(
+                `<div>
+                     V041 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_97aee13593f5561488f3977be75c360f = L.polyline(
+                [[23.906678371488788, 90.49529539037951], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_97aee13593f5561488f3977be75c360f.bindTooltip(
+                `<div>
+                     V044 &middot; motorcycle &rarr; S076 (slot 5) &middot; 23.18 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_70d1115da2c2a0c13faf6f8276336601 = L.circleMarker(
+                [23.906678371488788, 90.49529539037951],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_70d1115da2c2a0c13faf6f8276336601.bindTooltip(
+                `<div>
+                     V044 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_1370c8dd8bb762d6d72d68946d051af1 = L.polyline(
+                [[23.894827483108884, 90.4821599555261], [23.7106164, 90.4179559]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_1370c8dd8bb762d6d72d68946d051af1.bindTooltip(
+                `<div>
+                     V064 &middot; motorcycle &rarr; S076 (slot 5) &middot; 21.50 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_06001cb880d442dee317cc867e6111b6 = L.circleMarker(
+                [23.894827483108884, 90.4821599555261],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_06001cb880d442dee317cc867e6111b6.bindTooltip(
+                `<div>
+                     V064 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_912e7ea560986720f9862f76d21340f4 = L.polyline(
+                [[23.76355544556437, 90.49268894286797], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_912e7ea560986720f9862f76d21340f4.bindTooltip(
+                `<div>
+                     V060 &middot; car &rarr; S073 (slot 5) &middot; 10.12 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_cff94cb336e3f9214a86ded1fe9ea4b6 = L.circleMarker(
+                [23.76355544556437, 90.49268894286797],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_cff94cb336e3f9214a86ded1fe9ea4b6.bindTooltip(
+                `<div>
+                     V060 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_59ab5f1f9dad886821e576667cf74520 = L.polyline(
+                [[23.750650138418955, 90.45873299721433], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#a855f7", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_59ab5f1f9dad886821e576667cf74520.bindTooltip(
+                `<div>
+                     V062 &middot; car &rarr; S073 (slot 5) &middot; 6.55 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6cde82d4cd91e3957e373853e20398db = L.circleMarker(
+                [23.750650138418955, 90.45873299721433],
+                {"bubblingMouseEvents": true, "color": "#a855f7", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#a855f7", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_6cde82d4cd91e3957e373853e20398db.bindTooltip(
+                `<div>
+                     V062 &middot; car
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_c3f29e3f64a0bb3484d3e04f6911d7c2 = L.polyline(
+                [[23.82951433991505, 90.41073359504038], [23.7098521, 90.4123786]],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#3b82f6", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 1.4}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            poly_line_c3f29e3f64a0bb3484d3e04f6911d7c2.bindTooltip(
+                `<div>
+                     V068 &middot; motorcycle &rarr; S073 (slot 5) &middot; 13.31 km
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b4af885caf78665c09e23859e64f9e2c = L.circleMarker(
+                [23.82951433991505, 90.41073359504038],
+                {"bubblingMouseEvents": true, "color": "#3b82f6", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3b82f6", "fillOpacity": 0.95, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 0}
+            ).addTo(feature_group_8db147a94ec521c9747e8136932c4127);
+        
+    
+            circle_marker_b4af885caf78665c09e23859e64f9e2c.bindTooltip(
+                `<div>
+                     V068 &middot; motorcycle
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var feature_group_afb1e96d6587fca276b5aed1c8f99abb = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_593eed87fc862f194e0e87715949ea2f = L.circleMarker(
+                [23.7884774, 90.3260413],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.333333333333336, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_c35cab28da0fe4cc075c14e1a5a2d6aa = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_e8b604138accfdcbdf3869448d0e2c97 = $(`<div id="html_e8b604138accfdcbdf3869448d0e2c97" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>H.K Filling Station</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S247 &middot; pumps 2 &middot; octane, diesel</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;10/12 &nbsp;(83%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 1</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 2</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 3</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 4</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 5</td><td style='text-align:right'>2/2</td></tr></tbody></table></div></div>`)[0];
+                popup_c35cab28da0fe4cc075c14e1a5a2d6aa.setContent(html_e8b604138accfdcbdf3869448d0e2c97);
+            
+        
+
+        circle_marker_593eed87fc862f194e0e87715949ea2f.bindPopup(popup_c35cab28da0fe4cc075c14e1a5a2d6aa)
+        ;
+
+        
+    
+    
+            circle_marker_593eed87fc862f194e0e87715949ea2f.bindTooltip(
+                `<div>
+                     H.K Filling Station &middot; 10/12 (83%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_bf6173350d9b4122c4d1bd71323af426 = L.circleMarker(
+                [23.900798, 90.3993377],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.333333333333336, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_4d0b8aacf9ccd9092ede46b701a3b96d = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_3d96e9784ec8b53c9592ce2130098ba3 = $(`<div id="html_3d96e9784ec8b53c9592ce2130098ba3" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>স্পীডওয়েল সিএনজি ফিলিং স্টেশন</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S168 &middot; pumps 2 &middot; octane, diesel</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;10/12 &nbsp;(83%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 1</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 2</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 4</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 5</td><td style='text-align:right'>2/2</td></tr></tbody></table></div></div>`)[0];
+                popup_4d0b8aacf9ccd9092ede46b701a3b96d.setContent(html_3d96e9784ec8b53c9592ce2130098ba3);
+            
+        
+
+        circle_marker_bf6173350d9b4122c4d1bd71323af426.bindPopup(popup_4d0b8aacf9ccd9092ede46b701a3b96d)
+        ;
+
+        
+    
+    
+            circle_marker_bf6173350d9b4122c4d1bd71323af426.bindTooltip(
+                `<div>
+                     স্পীডওয়েল সিএনজি ফিলিং স্টেশন &middot; 10/12 (83%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d1f31209817c65a26d7f883f252f98a6 = L.circleMarker(
+                [23.7106164, 90.4179559],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.333333333333336, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_bb8c9924eb7bea908091d8314b6f53c3 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_9d97ff70025fa9e8994d7e44d132ec89 = $(`<div id="html_9d97ff70025fa9e8994d7e44d132ec89" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Famous Diesel Service</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S076 &middot; pumps 2 &middot; octane, diesel</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;10/12 &nbsp;(83%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 1</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 2</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 3</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 5</td><td style='text-align:right'>2/2</td></tr></tbody></table></div></div>`)[0];
+                popup_bb8c9924eb7bea908091d8314b6f53c3.setContent(html_9d97ff70025fa9e8994d7e44d132ec89);
+            
+        
+
+        circle_marker_d1f31209817c65a26d7f883f252f98a6.bindPopup(popup_bb8c9924eb7bea908091d8314b6f53c3)
+        ;
+
+        
+    
+    
+            circle_marker_d1f31209817c65a26d7f883f252f98a6.bindTooltip(
+                `<div>
+                     Famous Diesel Service &middot; 10/12 (83%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8b87a086f4abf8c7edc55f036e80c7da = L.circleMarker(
+                [23.7074926, 90.4349714],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.333333333333336, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_7a3826e737d87d1b7ebe42b8252f658c = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_de7247d7505d634128c4f4026d75f037 = $(`<div id="html_de7247d7505d634128c4f4026d75f037" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Metro CNG Den & Food Safari, Gas station, South Jatrabari, Dhaka</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S150 &middot; pumps 1 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;5/6 &nbsp;(83%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 2</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 3</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 4</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 5</td><td style='text-align:right'>1/1</td></tr></tbody></table></div></div>`)[0];
+                popup_7a3826e737d87d1b7ebe42b8252f658c.setContent(html_de7247d7505d634128c4f4026d75f037);
+            
+        
+
+        circle_marker_8b87a086f4abf8c7edc55f036e80c7da.bindPopup(popup_7a3826e737d87d1b7ebe42b8252f658c)
+        ;
+
+        
+    
+    
+            circle_marker_8b87a086f4abf8c7edc55f036e80c7da.bindTooltip(
+                `<div>
+                     Metro CNG Den & Food Safari, Gas station, South Jatrabari, Dhaka &middot; 5/6 (83%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_80e0f64b27a108ec7ca4be728e7f599c = L.circleMarker(
+                [23.7794051, 90.3563644],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 25.333333333333336, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_9f6760cf30eab0f80f2ded8f3840e619 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_5d8db7b6fe1353e6d8d29597c83c2a0c = $(`<div id="html_5d8db7b6fe1353e6d8d29597c83c2a0c" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>মেসার্স রহমান সার্ভিস স্টেশন</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S145 &middot; pumps 1 &middot; octane, diesel</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;5/6 &nbsp;(83%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 1</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 2</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 3</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 5</td><td style='text-align:right'>1/1</td></tr></tbody></table></div></div>`)[0];
+                popup_9f6760cf30eab0f80f2ded8f3840e619.setContent(html_5d8db7b6fe1353e6d8d29597c83c2a0c);
+            
+        
+
+        circle_marker_80e0f64b27a108ec7ca4be728e7f599c.bindPopup(popup_9f6760cf30eab0f80f2ded8f3840e619)
+        ;
+
+        
+    
+    
+            circle_marker_80e0f64b27a108ec7ca4be728e7f599c.bindTooltip(
+                `<div>
+                     মেসার্স রহমান সার্ভিস স্টেশন &middot; 5/6 (83%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_048ae766fec3bce077e1597ba2918063 = L.circleMarker(
+                [23.7098521, 90.4123786],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 29.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_be81be38be7145d34dc1d02c3cb608c2 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_cf617bfed173a66b03bc6e8d7ff0dc48 = $(`<div id="html_cf617bfed173a66b03bc6e8d7ff0dc48" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Q. G. Samdani & Co.</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S073 &middot; pumps 3 &middot; octane, diesel</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;18/18 &nbsp;(100%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>3/3</td></tr><tr><td>slot 1</td><td style='text-align:right'>3/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>3/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>3/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>3/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>3/3</td></tr></tbody></table></div></div>`)[0];
+                popup_be81be38be7145d34dc1d02c3cb608c2.setContent(html_cf617bfed173a66b03bc6e8d7ff0dc48);
+            
+        
+
+        circle_marker_048ae766fec3bce077e1597ba2918063.bindPopup(popup_be81be38be7145d34dc1d02c3cb608c2)
+        ;
+
+        
+    
+    
+            circle_marker_048ae766fec3bce077e1597ba2918063.bindTooltip(
+                `<div>
+                     Q. G. Samdani & Co. &middot; 18/18 (100%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3ed76af8e82ac599650262a436d832a1 = L.circleMarker(
+                [23.750901, 90.3960067],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#ef4444", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 23.5, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_e61cbdb20aaa7774399912e10e711201 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_28b9e1d5d9f59a8f76969ac1a12e7f0b = $(`<div id="html_28b9e1d5d9f59a8f76969ac1a12e7f0b" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>CNG Fuel Station</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S045 &middot; pumps 2 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#ef4444;margin-bottom:6px'>Daily load &nbsp;9/12 &nbsp;(75%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 1</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 2</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 3</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 4</td><td style='text-align:right'>1/2</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/2</td></tr></tbody></table></div></div>`)[0];
+                popup_e61cbdb20aaa7774399912e10e711201.setContent(html_28b9e1d5d9f59a8f76969ac1a12e7f0b);
+            
+        
+
+        circle_marker_3ed76af8e82ac599650262a436d832a1.bindPopup(popup_e61cbdb20aaa7774399912e10e711201)
+        ;
+
+        
+    
+    
+            circle_marker_3ed76af8e82ac599650262a436d832a1.bindTooltip(
+                `<div>
+                     CNG Fuel Station &middot; 9/12 (75%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e45f52e55f70ec208a7013218641678c = L.circleMarker(
+                [23.7328023, 90.3625001],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.666666666666666, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_273b384568b2b63279f9244926f10042 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_30fa00ee26f86035b5ee3e0c06aa2c56 = $(`<div id="html_30fa00ee26f86035b5ee3e0c06aa2c56" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>R S CNG Filling Station Ltd.</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S159 &middot; pumps 3 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;3/18 &nbsp;(17%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>1/3</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>1/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>1/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_273b384568b2b63279f9244926f10042.setContent(html_30fa00ee26f86035b5ee3e0c06aa2c56);
+            
+        
+
+        circle_marker_e45f52e55f70ec208a7013218641678c.bindPopup(popup_273b384568b2b63279f9244926f10042)
+        ;
+
+        
+    
+    
+            circle_marker_e45f52e55f70ec208a7013218641678c.bindTooltip(
+                `<div>
+                     R S CNG Filling Station Ltd. &middot; 3/18 (17%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b6806d6e7688a0e25a884b19322e6fb8 = L.circleMarker(
+                [23.668022, 90.4858851],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.666666666666666, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_bdec771933df86c0977d4120703f4f79 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_e923ead80a55cea9ceb5cc1c04e8129e = $(`<div id="html_e923ead80a55cea9ceb5cc1c04e8129e" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Firoj Filling Station ফিরোজ ফিলিং স্টেশন</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S218 &middot; pumps 2 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;2/12 &nbsp;(17%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>1/2</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/2</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/2</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/2</td></tr><tr><td>slot 4</td><td style='text-align:right'>1/2</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/2</td></tr></tbody></table></div></div>`)[0];
+                popup_bdec771933df86c0977d4120703f4f79.setContent(html_e923ead80a55cea9ceb5cc1c04e8129e);
+            
+        
+
+        circle_marker_b6806d6e7688a0e25a884b19322e6fb8.bindPopup(popup_bdec771933df86c0977d4120703f4f79)
+        ;
+
+        
+    
+    
+            circle_marker_b6806d6e7688a0e25a884b19322e6fb8.bindTooltip(
+                `<div>
+                     Firoj Filling Station ফিরোজ ফিলিং স্টেশন &middot; 2/12 (17%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_59a5844374aaa344dba393302266e1a2 = L.circleMarker(
+                [23.7008278, 90.4360719],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_6e1c43636bd4e2d2612c388b270b656c = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_b5b583ebe917bac0c7dee62043ac4bdb = $(`<div id="html_b5b583ebe917bac0c7dee62043ac4bdb" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>নাভানা সিএনজি স্টেশন</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S213 &middot; pumps 3 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;0/18 &nbsp;(0%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 1</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_6e1c43636bd4e2d2612c388b270b656c.setContent(html_b5b583ebe917bac0c7dee62043ac4bdb);
+            
+        
+
+        circle_marker_59a5844374aaa344dba393302266e1a2.bindPopup(popup_6e1c43636bd4e2d2612c388b270b656c)
+        ;
+
+        
+    
+    
+            circle_marker_59a5844374aaa344dba393302266e1a2.bindTooltip(
+                `<div>
+                     নাভানা সিএনজি স্টেশন &middot; 0/18 (0%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c11fa5201e7ce813f589f8067de9ef95 = L.circleMarker(
+                [23.7478287, 90.4036079],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_613630d8bd6ed57788cb609b2043a6e4 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_8ba5a5859b9a3a450c12289cd7aa4354 = $(`<div id="html_8ba5a5859b9a3a450c12289cd7aa4354" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>অনুদীপ সিএনজি/এলপিজি ফিলিং স্টেশন এন্ড ওয়ার্কশপ</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S096 &middot; pumps 3 &middot; octane, diesel</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;0/18 &nbsp;(0%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_613630d8bd6ed57788cb609b2043a6e4.setContent(html_8ba5a5859b9a3a450c12289cd7aa4354);
+            
+        
+
+        circle_marker_c11fa5201e7ce813f589f8067de9ef95.bindPopup(popup_613630d8bd6ed57788cb609b2043a6e4)
+        ;
+
+        
+    
+    
+            circle_marker_c11fa5201e7ce813f589f8067de9ef95.bindTooltip(
+                `<div>
+                     অনুদীপ সিএনজি/এলপিজি ফিলিং স্টেশন এন্ড ওয়ার্কশপ &middot; 0/18 (0%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_c7cb1e4bf7949f659f5f568ee536f874 = L.circleMarker(
+                [23.7085158, 90.424106],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_bcfa7fb5540b0285de3703b76804541a = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_f90c2562ff338576d002f10461d7ba27 = $(`<div id="html_f90c2562ff338576d002f10461d7ba27" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Station-S201</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S201 &middot; pumps 3 &middot; octane, diesel</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;0/18 &nbsp;(0%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_bcfa7fb5540b0285de3703b76804541a.setContent(html_f90c2562ff338576d002f10461d7ba27);
+            
+        
+
+        circle_marker_c7cb1e4bf7949f659f5f568ee536f874.bindPopup(popup_bcfa7fb5540b0285de3703b76804541a)
+        ;
+
+        
+    
+    
+            circle_marker_c7cb1e4bf7949f659f5f568ee536f874.bindTooltip(
+                `<div>
+                     Station-S201 &middot; 0/18 (0%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_43756994522967117a35439fe22215d1 = L.circleMarker(
+                [23.7826729, 90.3470612],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8.222222222222221, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_326d8ac213ee1af5de1c8f01c5383dca = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_6b51709db53b316b4516bced42b2cd77 = $(`<div id="html_6b51709db53b316b4516bced42b2cd77" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>এসপি ফিলিং স্টেশনে</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S083 &middot; pumps 3 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;1/18 &nbsp;(6%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>1/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_326d8ac213ee1af5de1c8f01c5383dca.setContent(html_6b51709db53b316b4516bced42b2cd77);
+            
+        
+
+        circle_marker_43756994522967117a35439fe22215d1.bindPopup(popup_326d8ac213ee1af5de1c8f01c5383dca)
+        ;
+
+        
+    
+    
+            circle_marker_43756994522967117a35439fe22215d1.bindTooltip(
+                `<div>
+                     এসপি ফিলিং স্টেশনে &middot; 1/18 (6%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_477607e4296b127229e67f8cc939731b = L.circleMarker(
+                [23.9070478, 90.321594],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_fbc8585149f8dae74fb5b4dfb3f0a088 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_bc65b6e505afe8cd3ca58a201dabdad3 = $(`<div id="html_bc65b6e505afe8cd3ca58a201dabdad3" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Azad CNG Petro and Chemical Co., Gas station</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S176 &middot; pumps 3 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;0/18 &nbsp;(0%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_fbc8585149f8dae74fb5b4dfb3f0a088.setContent(html_bc65b6e505afe8cd3ca58a201dabdad3);
+            
+        
+
+        circle_marker_477607e4296b127229e67f8cc939731b.bindPopup(popup_fbc8585149f8dae74fb5b4dfb3f0a088)
+        ;
+
+        
+    
+    
+            circle_marker_477607e4296b127229e67f8cc939731b.bindTooltip(
+                `<div>
+                     Azad CNG Petro and Chemical Co., Gas station &middot; 0/18 (0%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1d03a956167c87e2d5caac711b4b6d9d = L.circleMarker(
+                [23.7121866, 90.3909503],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.666666666666666, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_967d665a7cfa379e9e3b0325d2ebbdca = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_1628fb9fbcdbfddd2ce036889f066be6 = $(`<div id="html_1628fb9fbcdbfddd2ce036889f066be6" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Madina Filling Station</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S161 &middot; pumps 1 &middot; octane, diesel</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;1/6 &nbsp;(17%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/1</td></tr></tbody></table></div></div>`)[0];
+                popup_967d665a7cfa379e9e3b0325d2ebbdca.setContent(html_1628fb9fbcdbfddd2ce036889f066be6);
+            
+        
+
+        circle_marker_1d03a956167c87e2d5caac711b4b6d9d.bindPopup(popup_967d665a7cfa379e9e3b0325d2ebbdca)
+        ;
+
+        
+    
+    
+            circle_marker_1d03a956167c87e2d5caac711b4b6d9d.bindTooltip(
+                `<div>
+                     Madina Filling Station &middot; 1/6 (17%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0818c9116bd6181f9f173701c26324f0 = L.circleMarker(
+                [23.6951999, 90.4959761],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10.666666666666666, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_a6c67d7c9d28443e4d87416f83f7c786 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_ed3a98015f55e7b44f6723a4d4d05df4 = $(`<div id="html_ed3a98015f55e7b44f6723a4d4d05df4" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>Shams Filling Station</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S202 &middot; pumps 1 &middot; octane, diesel</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;1/6 &nbsp;(17%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>1/1</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/1</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/1</td></tr></tbody></table></div></div>`)[0];
+                popup_a6c67d7c9d28443e4d87416f83f7c786.setContent(html_ed3a98015f55e7b44f6723a4d4d05df4);
+            
+        
+
+        circle_marker_0818c9116bd6181f9f173701c26324f0.bindPopup(popup_a6c67d7c9d28443e4d87416f83f7c786)
+        ;
+
+        
+    
+    
+            circle_marker_0818c9116bd6181f9f173701c26324f0.bindTooltip(
+                `<div>
+                     Shams Filling Station &middot; 1/6 (17%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b8a9de9ece6b412ccaa38fc5c950cc2c = L.circleMarker(
+                [23.6946728, 90.4861493],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#22c55e", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 7.0, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_3762af0c57ddc13a2086f3fab6aa52f3 = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_2e373e45c6b3dd373279ffecd3e64582 = $(`<div id="html_2e373e45c6b3dd373279ffecd3e64582" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>PDK Filling Station</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S055 &middot; pumps 3 &middot; octane, diesel, cng</div><div style='font-weight:600;color:#22c55e;margin-bottom:6px'>Daily load &nbsp;0/18 &nbsp;(0%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 0</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 1</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 2</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 3</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/3</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/3</td></tr></tbody></table></div></div>`)[0];
+                popup_3762af0c57ddc13a2086f3fab6aa52f3.setContent(html_2e373e45c6b3dd373279ffecd3e64582);
+            
+        
+
+        circle_marker_b8a9de9ece6b412ccaa38fc5c950cc2c.bindPopup(popup_3762af0c57ddc13a2086f3fab6aa52f3)
+        ;
+
+        
+    
+    
+            circle_marker_b8a9de9ece6b412ccaa38fc5c950cc2c.bindTooltip(
+                `<div>
+                     PDK Filling Station &middot; 0/18 (0%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6eb3b0571c4c89d0402724823a447010 = L.circleMarker(
+                [23.8061746, 90.3740504],
+                {"bubblingMouseEvents": true, "color": "#0f172a", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f59e0b", "fillOpacity": 0.85, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 16.166666666666668, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_afb1e96d6587fca276b5aed1c8f99abb);
+        
+    
+        var popup_b0145f9034e97c031a695c6132d2173d = L.popup({
+  "maxWidth": 340,
+});
+
+        
+            
+                var html_7b37b6635356400784ce10b0e4997d6e = $(`<div id="html_7b37b6635356400784ce10b0e4997d6e" style="width: 100.0%; height: 100.0%;"><div style='font-family:Inter,system-ui;min-width:220px'><div style='font-weight:700;font-size:14px'>শতাব্দী সিএনজি ফিলিং স্টেশন</div><div style='color:#64748b;font-size:12px;margin-bottom:8px'>S116 &middot; pumps 2 &middot; octane, diesel</div><div style='font-weight:600;color:#f59e0b;margin-bottom:6px'>Daily load &nbsp;5/12 &nbsp;(42%)</div><table style='font-size:12px;width:100%;border-collapse:collapse'><thead><tr><th style='text-align:left'>Slot</th><th style='text-align:right'>used/cap</th></tr></thead><tbody><tr><td>slot 1</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 2</td><td style='text-align:right'>2/2</td></tr><tr><td>slot 3</td><td style='text-align:right'>1/2</td></tr><tr><td>slot 4</td><td style='text-align:right'>0/2</td></tr><tr><td>slot 5</td><td style='text-align:right'>0/2</td></tr></tbody></table></div></div>`)[0];
+                popup_b0145f9034e97c031a695c6132d2173d.setContent(html_7b37b6635356400784ce10b0e4997d6e);
+            
+        
+
+        circle_marker_6eb3b0571c4c89d0402724823a447010.bindPopup(popup_b0145f9034e97c031a695c6132d2173d)
+        ;
+
+        
+    
+    
+            circle_marker_6eb3b0571c4c89d0402724823a447010.bindTooltip(
+                `<div>
+                     শতাব্দী সিএনজি ফিলিং স্টেশন &middot; 5/12 (42%)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_afb1e96d6587fca276b5aed1c8f99abb.addTo(map_7bae3299d9db232215508f90f7e8d453);
+        
+    
+            var heat_map_4ad1bbc28716a976961de5636deae4ee = L.heatLayer(
+                [[23.7884774, 90.3260413, 10], [23.900798, 90.3993377, 10], [23.7106164, 90.4179559, 10], [23.7074926, 90.4349714, 5], [23.7794051, 90.3563644, 5], [23.7098521, 90.4123786, 18], [23.750901, 90.3960067, 9], [23.7328023, 90.3625001, 3], [23.668022, 90.4858851, 2], [23.7008278, 90.4360719, 0], [23.7478287, 90.4036079, 0], [23.7085158, 90.424106, 0], [23.7826729, 90.3470612, 1], [23.9070478, 90.321594, 0], [23.7121866, 90.3909503, 1], [23.6951999, 90.4959761, 1], [23.6946728, 90.4861493, 0], [23.8061746, 90.3740504, 5]],
+                {
+  "minOpacity": 0.35,
+  "maxZoom": 18,
+  "radius": 30,
+  "blur": 24,
+  "gradient": {
+  0.2: "#22c55e",
+  0.5: "#f59e0b",
+  0.85: "#ef4444",
+},
+}
+            );
+        
+    
+            var layer_control_2b4f21cb88942309ccba7dce3819762e_layers = {
+                base_layers : {
+                    "Light" : tile_layer_c13b9fe2b7f97cb9cc4d950e387b882e,
+                    "Dark" : tile_layer_072f111d5e787982efabb74e19e9793b,
+                    "Esri Gray" : tile_layer_0d898a7b7dadb8e2f1f0d112e010bd0a,
+                },
+                overlays :  {
+                    "Assignments \u2014 slot 0" : feature_group_05ce24a6f4ca64e4cb7cc5fcea4f3926,
+                    "Assignments \u2014 slot 1" : feature_group_ceb9a3c7d5f6b78409313b129bbe73d7,
+                    "Assignments \u2014 slot 2" : feature_group_0dabb6153cb7437f794c15b38b46e92a,
+                    "Assignments \u2014 slot 3" : feature_group_272a06f1597ec852ea9cc09ee11a9361,
+                    "Assignments \u2014 slot 4" : feature_group_49454194add8d24865a50f8fb2ef5620,
+                    "Assignments \u2014 slot 5" : feature_group_8db147a94ec521c9747e8136932c4127,
+                    "Stations (load)" : feature_group_afb1e96d6587fca276b5aed1c8f99abb,
+                    "Congestion heatmap" : heat_map_4ad1bbc28716a976961de5636deae4ee,
+                },
+            };
+            let layer_control_2b4f21cb88942309ccba7dce3819762e = L.control.layers(
+                layer_control_2b4f21cb88942309ccba7dce3819762e_layers.base_layers,
+                layer_control_2b4f21cb88942309ccba7dce3819762e_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_7bae3299d9db232215508f90f7e8d453);
+
+        
+</script>
+</html>
