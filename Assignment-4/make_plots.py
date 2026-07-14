@@ -136,7 +136,7 @@ def plot_value_heatmap(V, filename):
 
 def plot_gaps(gaps, filename):
     """Distribution of the best-vs-second-best action-value margin at every
-    state -- shows the optimum is NOT flat here (contrast with Pig)."""
+    state -- shows the optimum is NOT flat here."""
     values = np.array(list(gaps.values()))
     fig, ax = plt.subplots(figsize=(8, 4.8))
     ax.hist(values, bins=30, color=COLOR_VI, edgecolor=SURFACE, linewidth=0.6)
@@ -145,8 +145,7 @@ def plot_gaps(gaps, filename):
     style_axes(ax)
     ax.set_xlabel(r"$Q(s, a^*) - Q(s, a_{\mathrm{2nd\ best}})$  (best-action margin)")
     ax.set_ylabel("Number of states")
-    ax.set_title("The optimum is sharply peaked, not flat\n"
-                  "(contrast with Pig's near-ties): every state has a clearly-best action",
+    ax.set_title("The optimum is sharply peaked, not flat, every state has a clearly-best action",
                   fontsize=11)
     ax.legend(loc="upper right")
     fig.tight_layout()

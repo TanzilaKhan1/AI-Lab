@@ -126,7 +126,8 @@ def record_training_rollouts(
 
             next_state, reward, terminated, truncated, _ = env.step(action)
             done = terminated or truncated
-
+            
+            # Update Step
             q = get_q(state)
             next_best = 0.0 if terminated else np.max(get_q(next_state))
             q[action] += alpha * (reward + gamma * next_best - q[action])

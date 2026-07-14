@@ -55,12 +55,21 @@ p_{ij} = \frac{\tau_{ij}^{\alpha}\,\eta_{ij}^{\beta}}{\sum_{k \in \mathcal{F}} \
 \eta_{ij} = \frac{1}{t_{ij} + \hat{t}_{\text{shelter}}(j)},
 \label{eq:trans}
 \end{equation}
-where $\tau_{ij}$ is the pheromone on road $(i,j)$, $t_{ij}$ is its travel time, $\hat{t}_{\text{shelter}}(j)$ is the straight-line time estimate from $j$ to the nearest shelter, $\alpha$ weights memory, $\beta$ weights instinct, and $\mathcal{F}$ is the set of neighbours reachable before the fire. After each iteration,
+where each term means:
+\begin{itemize}
+\item $\tau_{ij}$ (pheromone): the colony's memory, i.e.\ how much past successful ants favoured road $(i,j)$.
+\item $\eta_{ij}$ (heuristic): the ant's instinct, a quick score for how good $(i,j)$ looks right now with no memory involved.
+\item $\alpha, \beta$: how much weight the ant gives to memory ($\alpha$) versus instinct ($\beta$) when the two disagree.
+\item $\mathcal{F}$: the feasible set, i.e.\ neighbours of $i$ that can still be reached before the fire arrives.
+\item $t_{ij}$: the travel time along road $(i,j)$.
+\item $\hat{t}_{\text{shelter}}(j)$: the estimated straight-line time from $j$ onward to the nearest shelter.
+\end{itemize}
+$\eta_{ij}$ is the reciprocal of $t_{ij}+\hat{t}_{\text{shelter}}(j)$, so roads that are quick to drive and point toward a shelter score higher. After each iteration, pheromone is updated by evaporation and then deposit:
 \begin{align}
 \tau_{ij} &\leftarrow (1-\rho)\,\tau_{ij} \quad \text{(evaporation)}, \label{eq:evap}\\
 \tau_{ij} &\leftarrow \tau_{ij} + Q / L \quad \text{on the best plan's successful routes}, \label{eq:dep}
 \end{align}
-with evaporation rate $\rho$, deposit constant $Q$, and $L$ the plan's total penalized time.
+where $\rho$ is the evaporation rate, the fraction of pheromone lost each round so old trails fade and the colony can abandon roads the fire has cut off; $Q$ is a fixed deposit constant; and $L$ is the best plan's total penalized time, so a faster plan (smaller $L$) earns a larger $Q/L$ reward and reinforces itself more strongly.
 
 % ============================================================
 \section{Related Work and Gap}
@@ -96,7 +105,46 @@ T = \sum_{\text{groups}} \big(\text{arrival time at shelter}\big)
 with $P = 8$ hours, so saving everyone outweighs speed without needing a second objective.
 
 \subsection{Parameters}
-The run uses 40 ants, 120 iterations, $\alpha = 1$, $\beta = 3$, $\rho = 0.15$, and $Q = 10$. The network is an $11 \times 11$ grid of intersections with 22\% of the grid segments removed and a driving speed of 40~km/h. The fire has a 6~km/h still-air spread, a wind factor of 0.65, and a safety margin of 0.12~h. Each scenario has 6 groups and 4 shelters. Deposit is elitist, applied to the best-so-far plan only, which converges quickly, while evaporation and the stochastic rule keep the search exploring.
+The complete setup is best read as the rules of a board game: a map (the road network), a threat (the fire), players with a goal (the groups and shelters), a survival rule (the feasibility clock), and a solver (ACO). Table~\ref{tab:params} lists every parameter grouped by role, with its value and its plain meaning.
+
+\begin{table}[H]
+\centering
+\caption{Simulation and algorithm parameters, grouped by role.}
+\label{tab:params}
+\small
+\begin{tabular}{@{}llp{7.6cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Value} & \textbf{Meaning} \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Map (the road network)}} \\
+Grid size        & $11 \times 11$ & Intersections (nodes) laid out as a grid. \\
+Spacing          & 3.0~km         & Nominal distance between neighbouring intersections. \\
+Jitter           & 0.55           & Random positional shift so the grid looks like an organic town, not a perfect lattice. \\
+Roads removed    & 22\%           & Fraction of grid segments deleted at random, creating realistic dead ends and detours. \\
+Driving speed    & 40~km/h        & Constant vehicle speed used to turn road length into travel time. \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Threat (the fire)}} \\
+Still-air spread & 6~km/h         & How fast the fire front moves outward with no wind. \\
+Wind factor $W$  & 0.65           & Wind strength; the front moves up to $65\%$ faster downwind and slower upwind, stretching it into an ellipse. \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Players and goal (evacuation)}} \\
+Groups           & 6              & Neighbourhood groups (origins) that must reach safety. \\
+Shelters         & 4              & Designated safe zones each group can escape to. \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Survival rule (feasibility)}} \\
+Safety margin $m$ & 0.12~h ($\approx$7~min) & A road is usable only if the group clears its far end at least this long before the fire arrives. \\
+Fail penalty $P$ & 8~h            & Hours added per trapped group, so saving everyone outweighs moving a few quickly. \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Solver (ACO)}} \\
+Ants ($N$)       & 40             & Candidate plans explored per iteration. \\
+Iterations       & 120            & Rounds of exploration before the final plan is chosen. \\
+$\alpha$         & 1.0            & Weight on pheromone memory (trust in past successful ants). \\
+$\beta$          & 3.0            & Weight on the heuristic (instinct to head toward a shelter). \\
+$\rho$           & 0.15           & Evaporation rate; $15\%$ of pheromone fades each round so stale trails are abandoned. \\
+$Q$              & 10.0           & Deposit constant; sets the reward size dropped on the best plan's roads. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ============================================================
 \section{Results}
@@ -126,19 +174,19 @@ Across 15 independent random scenarios (network, ignition, wind, and origins all
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{Implementation/evacuation_map.png}
+\includegraphics[width=0.8\textwidth]{evacuation_map.png}
 \caption{The evacuation plan. Warm contour bands show when the fire arrives everywhere (the wind-stretched ellipse), the red X is the ignition, blue triangles are origins, green squares are shelters, and the coloured routes are the ACO plan.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.74\textwidth]{Implementation/pheromone.png}
+\includegraphics[width=0.74\textwidth]{pheromone.png}
 \caption{Learned pheromone corridors after convergence: bright edges are the roads the colony trusts to stay ahead of the fire.}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.78\textwidth]{Implementation/convergence.png}
+\includegraphics[width=0.78\textwidth]{convergence.png}
 \caption{Convergence, in two panels. Left: ACO descends from 21 to 5 hours, crossing both baselines, which sit high after their trapped-group penalties. Right: a zoom on the colony's search dynamics; the light trace is the best ant each iteration (exploration) over the descending best-so-far staircase, converged near iteration 43.}
 \end{figure}
 

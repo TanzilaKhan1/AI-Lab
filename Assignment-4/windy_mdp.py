@@ -133,7 +133,7 @@ def value_iteration(P, gamma=1.0, theta=1e-10):
 
 def action_value_gaps(P, V, gamma):
     """Margin between the best and second-best action at every state, used
-    to show the optimum is NOT flat here (contrast with Pig)."""
+    to show the optimum is NOT flat here."""
     def av(state, action):
         total = 0.0
         for prob, nxt, reward, done in P[state][action]:
