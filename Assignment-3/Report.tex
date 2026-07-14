@@ -1,0 +1,172 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+
+\definecolor{kw}{RGB}{150,40,27}
+
+\titleformat{\section}{\Large\bfseries\color{kw}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.6em}{}
+
+\title{\textbf{Ant Colony Optimization for Wildfire Evacuation Routing\\ over a Fire-Consuming Road Network}}
+\author{Tanzila Khan \\ Roll: 25 }
+\date{July 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent This report studies evacuation routing while a wildfire is burning through the road network. A fire starts near a wildland-urban-interface town and spreads outward, faster downwind, following the wind-stretched elliptical pattern used by operational fire simulators. Neighbourhood groups must drive to shelters, but each road segment has a fire arrival time and can be crossed only before the fire reaches it, allowing for a safety margin. The result is a time-dependent, NP-hard routing problem with no gradient and with discontinuous failure: one late segment can trap a group. We solve it with Ant Colony Optimization (ACO), implemented from scratch, checking feasibility against the fire clock at every construction step. We compare ACO against a fire-aware greedy router and a fire-blind shortest path under the same feasibility rules. In the demonstration scenario both baselines lose groups (18.96 and 11.72 penalized hours), while ACO evacuates all six groups in 5.02 hours, an improvement of 73.5\% and 57.1\%. Across 15 random scenarios ACO averages 3.54 hours against greedy's 12.18, with a Wilcoxon signed-rank $p \approx 0.0004$. Published ACO evacuation work is set indoors, in buildings, and published outdoor wildfire evacuation systems do not use ACO, so this combination addresses a gap confirmed by the literature review. The report gives the fire model, the ACO equations with every symbol defined, the constraint handling, the results, and the visualizations, including an animation of the fire front burning through the network while groups escape.
+\end{abstract}
+
+\bigskip
+
+% ============================================================
+\section{Problem Statement}
+
+A rural road network serves a town at the wildland-urban interface: a grid of intersections with a fraction of the segments missing, so the map has dead ends and forced detours like a real road system. A wildfire ignites upwind and spreads outward, and each intersection $n$ has a fire arrival time $t_{\text{fire}}(n)$. Several neighbourhood groups must drive from their homes to designated shelters. A group may drive road $(u, v)$ starting at time $t$ only if it leaves $u$ and reaches $v$ before the fire arrives at each, minus a safety margin. The task is to route every group to a shelter and minimize total evacuation time, with a large penalty for any group that cannot reach safety.
+
+\subsection{Why this problem is real}
+Wildfire evacuation is a current operational problem. The January 2025 Palisades and Eaton fires in California killed 29 people, destroyed over 15{,}000 structures, and displaced more than 130{,}000. Simulations of California WUI communities by the UC Institute of Transportation Studies show that route and timing decisions dominate outcomes: phased evacuation cut travel times by 13.5 to 70\%, and reducing vehicle counts cut fire-exposure time by 27 to 60\%. Operational fire spread models (Rothermel 1972; FARSITE, Finney 1998) produce the fire-arrival-time fields this problem uses.
+
+\subsection{Why it resists exact methods}
+Routing over a time-varying graph whose edges expire is NP-hard for multiple groups, and it must be re-solved as fire forecasts update. There is no gradient, and the objective has discontinuous failure points: one late segment turns a two-hour plan into a trapped group. A static shortest path is unsafe here, which our fire-blind baseline demonstrates by losing a group.
+
+% ============================================================
+\section{Background: Population-Based Optimization and ACO}
+
+A population-based metaheuristic keeps many candidate solutions that share information. The No Free Lunch theorem (Wolpert and Macready, 1997) says the algorithm must be justified by the structure of the problem. Here that structure is stepwise route construction on a graph with a per-step feasibility clock, which is how ACO already works.
+
+Ant Colony Optimization (Dorigo, Maniezzo and Colorni, 1996) is based on real ant colonies. Ants lay pheromone as they walk; shorter paths are traversed more often, so they accumulate more pheromone and recruit more ants, while evaporation removes stale trails. Later variants include the Ant Colony System (Dorigo and Gambardella, 1997) and the MAX-MIN Ant System (St\"utzle and Hoos, 2000). The evaporation mechanism corresponds directly to roads that the fire closes.
+
+\subsection{The ACO equations}
+An ant at intersection $i$ chooses the next feasible intersection $j$ with probability
+\begin{equation}
+p_{ij} = \frac{\tau_{ij}^{\alpha}\,\eta_{ij}^{\beta}}{\sum_{k \in \mathcal{F}} \tau_{ik}^{\alpha}\,\eta_{ik}^{\beta}},
+\qquad
+\eta_{ij} = \frac{1}{t_{ij} + \hat{t}_{\text{shelter}}(j)},
+\label{eq:trans}
+\end{equation}
+where $\tau_{ij}$ is the pheromone on road $(i,j)$, $t_{ij}$ is its travel time, $\hat{t}_{\text{shelter}}(j)$ is the straight-line time estimate from $j$ to the nearest shelter, $\alpha$ weights memory, $\beta$ weights instinct, and $\mathcal{F}$ is the set of neighbours reachable before the fire. After each iteration,
+\begin{align}
+\tau_{ij} &\leftarrow (1-\rho)\,\tau_{ij} \quad \text{(evaporation)}, \label{eq:evap}\\
+\tau_{ij} &\leftarrow \tau_{ij} + Q / L \quad \text{on the best plan's successful routes}, \label{eq:dep}
+\end{align}
+with evaporation rate $\rho$, deposit constant $Q$, and $L$ the plan's total penalized time.
+
+% ============================================================
+\section{Related Work and Gap}
+
+ACO for fire evacuation already exists indoors. Xu, Huang, Liu, Li and Chen (\emph{Journal of Building Engineering}, 2022) re-route building evacuees with an improved ACO driven by live fire-sensor data, and Wang (\emph{Journal of Ambient Intelligence and Smart Environments}, 2022) combines bidirectional ACO with A* for high-rise fires. On outdoor road networks, Samadzadegan, Zarrinpanjeh and Schenk (Gi4DM 2011) applied ACO to post-earthquake routing with static damage costs. Outdoor wildfire evacuation with dynamically expiring roads exists without ACO: RESCUE (Tammali, Khanda, Satpathy, Shovan and Das, ICDCN 2026) solves a time-varying multi-objective shortest path with an edge-fire-risk function, and Zhang, Tan and Tiong (\emph{Frontiers in Environmental Science}, 2025) combine SAR imagery, GNNs, Grey Wolf Optimization and multi-agent reinforcement learning for grassland-fire evacuation, reporting over 25\% reduction in evacuation time. The specific combination implemented here, pure ACO over an outdoor road network whose segments expire as a wind-driven fire front arrives, did not appear in the literature review. This is the gap the lab addresses, at student scale.
+
+% ============================================================
+\section{Solution Design}
+
+\subsection{Fire model}
+The fire arrival time at a point $\mathbf{p}$ is its distance from the ignition $\mathbf{q}$ divided by a directional spread rate:
+\begin{equation}
+t_{\text{fire}}(\mathbf{p}) = \frac{\|\mathbf{p}-\mathbf{q}\|}{r(\mathbf{p})},
+\qquad
+r(\mathbf{p}) = r_0 \Big(1 + W \cos\theta(\mathbf{p})\Big),
+\end{equation}
+where $r_0$ is the still-air spread rate, $W \in [0,1]$ is the wind strength, and $\theta$ is the angle between the spread direction and the wind. Downwind the fire moves up to $(1+W)\times$ faster and upwind it is slowed, which produces the wind-stretched ellipse of Huygens-type models (Richards 1990; FARSITE, Finney 1998), with Rothermel (1972) as the rate-of-spread ancestry: $R = R_0 (1 + \Phi_w + \Phi_s)$. The routing layer uses only this arrival-time field, so a higher-fidelity model such as the cellular automaton of Alexandridis et al. (2008) can replace it without changing the algorithm.
+
+\subsection{Encoding and feasibility}
+One ant proposes one full evacuation plan: for each group, an ordered list of intersections from its origin to a shelter. The feasibility rule, used by every method in the comparison, is
+\begin{equation}
+\text{cross}(u \to v \text{ at } t) \iff
+t \le t_{\text{fire}}(u) - m \;\wedge\; t + t_{uv} \le t_{\text{fire}}(v) - m,
+\end{equation}
+with safety margin $m$. It is checked at every construction hop, so no infeasible plan is ever built, and an ant that reaches a dead end returns a failed route. Every generated scenario is checked as solvable by a fire-aware Dijkstra oracle before use.
+
+\subsection{Objective}
+Minimize the total penalized evacuation time,
+\begin{equation}
+T = \sum_{\text{groups}} \big(\text{arrival time at shelter}\big)
++ P \cdot \#\{\text{trapped groups}\},
+\end{equation}
+with $P = 8$ hours, so saving everyone outweighs speed without needing a second objective.
+
+\subsection{Parameters}
+The run uses 40 ants, 120 iterations, $\alpha = 1$, $\beta = 3$, $\rho = 0.15$, and $Q = 10$. The network is an $11 \times 11$ grid of intersections with 22\% of the grid segments removed and a driving speed of 40~km/h. The fire has a 6~km/h still-air spread, a wind factor of 0.65, and a safety margin of 0.12~h. Each scenario has 6 groups and 4 shelters. Deposit is elitist, applied to the best-so-far plan only, which converges quickly, while evaporation and the stochastic rule keep the search exploring.
+
+% ============================================================
+\section{Results}
+
+\subsection{Summary}
+In the demonstration scenario (seed 19; 121 intersections, 174 segments; six groups, four shelters) ACO evacuated all six groups in 5.020 hours and had effectively converged by iteration 43 of 120. Both baselines lost groups. Table~\ref{tab:results} shows the comparison under the same feasibility rules. On the map the six routes visibly merge onto shared corridors, which is the pheromone consolidation shown directly.
+
+\begin{table}[h]
+\centering
+\caption{Total penalized evacuation time on the demonstration scenario (lower is better).}
+\label{tab:results}
+\begin{tabular}{lcc}
+\toprule
+Method & Total time (h) & ACO improvement \\
+\midrule
+ACO (this work) & 5.020 & --- \\
+Fire-aware greedy & 18.956 & 73.5\% \\
+Fire-blind shortest path & 11.715 & 57.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Statistical significance}
+Across 15 independent random scenarios (network, ignition, wind, and origins all resampled), ACO gave a mean of 3.536~h (std 0.884) against fire-aware greedy's 12.176~h (std 13.699), with a Wilcoxon signed-rank $p \approx 0.00043$, significant at 0.05. The greedy baseline's standard deviation is fifteen times ACO's because its failures are large: they leave groups trapped, which is the tail risk that matters most in an evacuation.
+
+\subsection{Figures}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{Implementation/evacuation_map.png}
+\caption{The evacuation plan. Warm contour bands show when the fire arrives everywhere (the wind-stretched ellipse), the red X is the ignition, blue triangles are origins, green squares are shelters, and the coloured routes are the ACO plan.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.74\textwidth]{Implementation/pheromone.png}
+\caption{Learned pheromone corridors after convergence: bright edges are the roads the colony trusts to stay ahead of the fire.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\textwidth]{Implementation/convergence.png}
+\caption{Convergence, in two panels. Left: ACO descends from 21 to 5 hours, crossing both baselines, which sit high after their trapped-group penalties. Right: a zoom on the colony's search dynamics; the light trace is the best ant each iteration (exploration) over the descending best-so-far staircase, converged near iteration 43.}
+\end{figure}
+
+\noindent The animation \texttt{evacuation\_animation.gif} shows the fire growing with a charred core, a burning rim with glowing embers, and a bright front line. Road segments blacken as they burn, and six labelled cars drive their routes between house-marked origins and shelter-marked houses, turning green when safe, with a heads-up display counting minutes, groups safe, and roads lost.
+
+% ============================================================
+\section{Discussion and Conclusion}
+
+ACO fits this problem because an evacuation route is a stepwise graph walk against a clock, and checking feasibility during construction means every plan the search considers could actually be issued. The comparison isolates the search strategy. Greedy uses the same feasibility rule and still gets trapped in dead-end pockets whose exits the fire closes, and the fire-blind baseline shows an ordinary shortest path losing a group outright. ACO's population spreads across corridors, and its pheromone concentrates on routes that are both fast and survive to the end, which cuts the mean time and, more importantly, the worst-case outcomes.
+
+Premature convergence is handled by evaporation, the stochastic transition rule, and elitist-but-eroding deposit; MAX-MIN pheromone bounds are the standard next step if it is needed. The fire model is deliberately the simplest field that keeps the operational geometry, and the separation between the fire field and the router means a Rothermel-based or cellular-automata forecast can replace it without changing the algorithm.
+
+% ============================================================
+\section*{References}
+\begin{enumerate}[leftmargin=*,itemsep=2pt]
+\item Dorigo, M., Maniezzo, V. and Colorni, A. Ant System: optimization by a colony of cooperating agents. \emph{IEEE Trans. Systems, Man, and Cybernetics B}, 26(1):29--41, 1996.
+\item Dorigo, M. and Gambardella, L.M. Ant Colony System: a cooperative learning approach to the traveling salesman problem. \emph{IEEE Trans. Evolutionary Computation}, 1(1):53--66, 1997.
+\item St\"utzle, T. and Hoos, H.H. MAX-MIN Ant System. \emph{Future Generation Computer Systems}, 16(8):889--914, 2000.
+\item Wolpert, D.H. and Macready, W.G. No free lunch theorems for optimization. \emph{IEEE Trans. Evolutionary Computation}, 1(1):67--82, 1997.
+\item Rothermel, R.C. A mathematical model for predicting fire spread in wildland fuels. USDA Forest Service Research Paper INT-115, 1972.
+\item Richards, G.D. An elliptical growth model of forest fire fronts and its numerical solution. \emph{Int. J. for Numerical Methods in Engineering}, 30(6):1163--1179, 1990.
+\item Finney, M.A. FARSITE: Fire Area Simulator---model development and evaluation. USDA Forest Service Research Paper RMRS-RP-4, 1998.
+\item Alexandridis, A., Vakalis, D., Siettos, C.I. and Bafas, G.V. A cellular automata model for forest fire spread prediction. \emph{Applied Mathematics and Computation}, 204:191--201, 2008.
+\item Xu, L., Huang, K., Liu, J., Li, D. and Chen, Y.F. Intelligent planning of fire evacuation routes using an improved ant colony optimization algorithm. \emph{Journal of Building Engineering}, 61:105208, 2022.
+\item Wang, J. Bidirectional ACO intelligent fire evacuation route optimization. \emph{Journal of Ambient Intelligence and Smart Environments}, 14(2):79--97, 2022.
+\item Samadzadegan, F., Zarrinpanjeh, N. and Schenk, T. Ant colony optimization for finding best routes in disaster affected urban area. \emph{Gi4DM (ISPRS)}, Antalya, Turkey, 2011.
+\item Zhang, Z., Tan, L. and Tiong, R.L.K. Evacuation path optimization algorithm for grassland fires based on SAR imagery and intelligent optimization. \emph{Frontiers in Environmental Science}, 13, 2025.
+\item Tammali, S., Khanda, A., Satpathy, A., Shovan, S.M. and Das, S.K. RESCUE: routing under evolving stochastic congestion and uncertain spread in wildfire emergencies. \emph{ICDCN}, ACM, 2026.
+\end{enumerate}
+
+\end{document}
