@@ -74,7 +74,7 @@ where $\rho$ is the evaporation rate, the fraction of pheromone lost each round 
 % ============================================================
 \section{Related Work and Gap}
 
-ACO for fire evacuation already exists indoors. Xu, Huang, Liu, Li and Chen (\emph{Journal of Building Engineering}, 2022) re-route building evacuees with an improved ACO driven by live fire-sensor data, and Wang (\emph{Journal of Ambient Intelligence and Smart Environments}, 2022) combines bidirectional ACO with A* for high-rise fires. On outdoor road networks, Samadzadegan, Zarrinpanjeh and Schenk (Gi4DM 2011) applied ACO to post-earthquake routing with static damage costs. Outdoor wildfire evacuation with dynamically expiring roads exists without ACO: RESCUE (Tammali, Khanda, Satpathy, Shovan and Das, ICDCN 2026) solves a time-varying multi-objective shortest path with an edge-fire-risk function, and Zhang, Tan and Tiong (\emph{Frontiers in Environmental Science}, 2025) combine SAR imagery, GNNs, Grey Wolf Optimization and multi-agent reinforcement learning for grassland-fire evacuation, reporting over 25\% reduction in evacuation time. The specific combination implemented here, pure ACO over an outdoor road network whose segments expire as a wind-driven fire front arrives, did not appear in the literature review. This is the gap the lab addresses, at student scale.
+ACO for fire evacuation already exists indoors. Xu, Huang, Liu, Li and Chen (\emph{Journal of Building Engineering}, 2022) re-route building evacuees with an improved ACO driven by live fire-sensor data, and Wang (\emph{Journal of Ambient Intelligence and Smart Environments}, 2022) combines bidirectional ACO with A* for high-rise fires. On outdoor road networks, Samadzadegan, Zarrinpanjeh and Schenk (Gi4DM 2011) applied ACO to post-earthquake routing with static damage costs. Outdoor wildfire evacuation with dynamically expiring roads exists without ACO: RESCUE (Tammali, Khanda, Satpathy, Shovan and Das, ICDCN 2026) solves a time-varying multi-objective shortest path with an edge-fire-risk function, and Zhang, Tan and Tiong (\emph{Frontiers in Environmental Science}, 2025) combine SAR imagery, GNNs, Grey Wolf Optimization and multi-agent reinforcement learning for grassland-fire evacuation, reporting over 25\% reduction in evacuation time. The specific combination implemented here, pure ACO over an outdoor road network whose segments expire as a wind-driven fire front arrives, did not appear in the literature review. 
 
 % ============================================================
 \section{Solution Design}
@@ -100,7 +100,7 @@ with safety margin $m$. It is checked at every construction hop, so no infeasibl
 Minimize the total penalized evacuation time,
 \begin{equation}
 T = \sum_{\text{groups}} \big(\text{arrival time at shelter}\big)
-+ P \cdot \#\{\text{trapped groups}\},
++ P \cdot \{\text{number of trapped groups}\},
 \end{equation}
 with $P = 8$ hours, so saving everyone outweighs speed without needing a second objective.
 
@@ -145,6 +145,15 @@ $Q$              & 10.0           & Deposit constant; sets the reward size dropp
 \bottomrule
 \end{tabular}
 \end{table}
+
+\subsection{The overall loop}
+Putting the pieces above together, the solver repeats one loop for 120 iterations, alternating a local, per-ant construction phase with a global, per-iteration update phase:
+\begin{enumerate}[leftmargin=*]
+\item \textbf{Local (each of the 40 ants, per group):} build a full route hop by hop, restricting each step to the feasible set $\mathcal{F}$ and sampling the next intersection with the transition probability (Eq.~\ref{eq:trans}); an ant with no feasible move left reports its group trapped.
+\item \textbf{Score:} once every ant has finished every group, compute each plan's total penalized time $T$ and keep the round's best plan.
+\item \textbf{Global (once per iteration):} evaporate pheromone on all roads (Eq.~\ref{eq:evap}), then deposit the elitist reward $Q/L$ only on the best plan's roads (Eq.~\ref{eq:dep}).
+\end{enumerate}
+The incumbent best plan across all 120 iterations is returned as the final routing.
 
 % ============================================================
 \section{Results}
@@ -195,9 +204,7 @@ Across 15 independent random scenarios (network, ignition, wind, and origins all
 % ============================================================
 \section{Discussion and Conclusion}
 
-ACO fits this problem because an evacuation route is a stepwise graph walk against a clock, and checking feasibility during construction means every plan the search considers could actually be issued. The comparison isolates the search strategy. Greedy uses the same feasibility rule and still gets trapped in dead-end pockets whose exits the fire closes, and the fire-blind baseline shows an ordinary shortest path losing a group outright. ACO's population spreads across corridors, and its pheromone concentrates on routes that are both fast and survive to the end, which cuts the mean time and, more importantly, the worst-case outcomes.
-
-Premature convergence is handled by evaporation, the stochastic transition rule, and elitist-but-eroding deposit; MAX-MIN pheromone bounds are the standard next step if it is needed. The fire model is deliberately the simplest field that keeps the operational geometry, and the separation between the fire field and the router means a Rothermel-based or cellular-automata forecast can replace it without changing the algorithm.
+ACO fits this problem because an evacuation route is a stepwise graph walk against a clock, and checking feasibility during construction means every plan the search considers could actually be issued. The comparison isolates the search strategy. Greedy uses the same feasibility rule and still gets trapped in dead-end pockets whose exits the fire closes, and the fire-blind baseline shows an ordinary shortest path losing a group outright. ACO's population spreads across corridors, and its pheromone concentrates on routes that are both fast and survive to the end, which cuts the mean time and, more importantly, the worst-case outcomes. Premature convergence is handled by evaporation, the stochastic transition rule, and elitist-but-eroding deposit.
 
 % ============================================================
 \section*{References}
