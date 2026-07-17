@@ -31,10 +31,11 @@ steps to the goal is therefore exactly the same as maximizing return, for
 ANY discount 0 < gamma <= 1 in a deterministic environment -- but here the
 environment is genuinely stochastic (the wind branches into up to three
 outcomes), so gamma is not just cosmetic: because -(1-gamma^T)/(1-gamma) is
-a concave function of the (random) path length T, Jensen's inequality means
-a smaller gamma penalises VARIANCE in path length, not just its mean. Two
-routes with the same expected length but different variance are no longer
-tied once gamma < 1 -- see the gamma sweep in the report.
+a convex, decreasing function of the (random) path length T (equivalently the
+cost (1-gamma^T)/(1-gamma) is concave and increasing in T), Jensen's
+inequality means gamma weights the whole distribution of path length, not
+just its mean. Two routes with the same expected length but different
+variance are no longer tied once gamma < 1 -- see the gamma sweep in the report.
 
 Unlike DoorKey (deterministic) or Pig (flat optimum away from the target),
 every state here has a clearly-best action with a real margin over the

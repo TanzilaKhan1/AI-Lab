@@ -2,6 +2,7 @@
 
 \usepackage[margin=2.5cm]{geometry}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{booktabs}
@@ -92,15 +93,18 @@ taken.
 
 \paragraph{Why $\gamma$ matters here.} With reward $-1$ per step
 until an absorbing goal, the discounted return from a state under a fixed
-number of remaining steps $T$ is $-\,\frac{1-\gamma^T}{1-\gamma}$, a concave,
-increasing function of $-T$. In a \emph{deterministic} shortest-path problem,
+number of remaining steps $T$ is $-\,\frac{1-\gamma^T}{1-\gamma}$, which as a
+function of the step count $T$ is decreasing and convex (equivalently, the
+accumulated cost $\frac{1-\gamma^T}{1-\gamma}$ is increasing and concave in
+$T$). In a \emph{deterministic} shortest-path problem,
 $T$ is fixed by the policy, so any $\gamma\in(0,1)$ ranks policies
 identically: $\gamma$ only has to be strictly less than 1. Here $T$ is a
-\emph{random variable} (the wind), so by Jensen's inequality the concavity of
-$-\frac{1-\gamma^T}{1-\gamma}$ makes the discounted objective sensitive to
-the whole distribution of $T$, not only its mean. A smaller $\gamma$ makes
-the objective more concave and reweights how much a policy's tail behavior
-counts. Section~8.1 shows this is not a theoretical curiosity: at
+\emph{random variable} (the wind), so a policy's value is
+$\mathbb{E}\!\left[-\frac{1-\gamma^T}{1-\gamma}\right]=-\frac{1-\mathbb{E}[\gamma^T]}{1-\gamma}$,
+which by Jensen's inequality depends on the whole distribution of $T$ through
+$\mathbb{E}[\gamma^T]$, not only its mean. The value of $\gamma$ sets how
+heavily the tail of the step-count distribution is weighted and can change
+which policy is optimal. Section~8.1 shows this is not a theoretical curiosity: at
 $\gamma=0.7$ the greedy policy is different from $\gamma\ge0.9$'s,
 not merely slower to compute.
 
