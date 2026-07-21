@@ -114,10 +114,12 @@ Because Windy Gridworld is a custom environment, Gymnasium exposes no
 transition table, so the model is derived analytically from the wind's known
 probabilities. From state \texttt{(r, c)} taking action
 $a$: the deterministic part of the move gives an intermediate cell
-\texttt{(r1, c1)} (clipped to the grid); then, if column \texttt{c1} is calm,
-the wind push is deterministically $0$; if it carries mean wind $w>0$, the
-push is $w-1$, $w$, or $w+1$ each with probability $1/3$. The next state is
-\texttt{(r1 - push, c1)}, clipped to the grid, with reward $-1$ and the
+\texttt{(r1, c1)} (clipped to the grid). Wind strength is determined by the
+pre-action column \texttt{c}, not the landing column \texttt{c1}: if column
+\texttt{c} is calm, the wind push is deterministically $0$; if it carries
+mean wind $w>0$, the push is $w-1$, $w$, or $w+1$ each with probability
+$1/3$. That row shift is then applied to the landing column: the next state
+is \texttt{(r1 - push, c1)}, clipped to the grid, with reward $-1$ and the
 episode ending if that cell is the goal.
 
 \section{Value Iteration}
@@ -126,7 +128,7 @@ episode ending if that cell is the goal.
 (Section~3) into a synchronous update rule, applied to every state until the
 value function stops changing appreciably:
 \begin{enumerate}
-  \item \textbf{Initialize} $V_0(s) = 0$ for every non-terminal state $s$;
+  \item \textbf{Initialise} $V_0(s) = 0$ for every non-terminal state $s$;
         $V(s_{\text{goal}}) = 0$, fixed, since the goal is absorbing.
   \item \textbf{Repeat} for sweep $k = 1, 2, \dots$:
   \begin{enumerate}
@@ -145,7 +147,7 @@ value function stops changing appreciably:
 
 Value Iteration was run with $\gamma=0.99$ and threshold $\theta=10^{-10}$;
 it converges in \textbf{116 sweeps} (Figure~\ref{fig:convergence}). Rolled
-out from the start for 5{,}000 episodes, the greedy policy reaches the goal
+out from the start for 5{,}000 episodes (evaluation seed 1), the greedy policy reaches the goal
 every time, in 20.53 steps on average. Figure~\ref{fig:value} shows
 the resulting value function: $V^*(s) = -$(expected discounted steps to the
 goal), lowest (most negative) far from the goal and in the strong-wind
@@ -171,11 +173,11 @@ columns, where the stochastic overshoot is costliest to correct.
 equation without a transition model, by sampling transitions from the real
 environment and bootstrapping off its own current estimate:
 \begin{enumerate}
-  \item \textbf{Initialize} $Q(s,a) = 0$ for every state-action pair; set the
+  \item \textbf{Initialise} $Q(s,a) = 0$ for every state-action pair; set the
         exploration rate $\varepsilon = \varepsilon_0$.
   \item \textbf{For each episode:}
   \begin{enumerate}
-    \item Initialize the state $s$ at the fixed start.
+    \item Initialise the state $s$ at the fixed start.
     \item \textbf{Repeat} for each step until $s$ is terminal:
     \begin{enumerate}
       \item Choose action $a$ from $s$ using an $\varepsilon$-greedy policy
@@ -193,23 +195,28 @@ environment and bootstrapping off its own current estimate:
 \end{enumerate}
 
 Q-Learning was trained against the real environment (\texttt{env.step()}
-only), with $\alpha=0.1$, $\gamma=0.99$, and $\varepsilon$-greedy exploration
-decaying from $1.0$ to a floor of $0.02$ over 50{,}000 episodes. Because
-every state is reachable from the fixed start within a few dozen steps, no
-exploring-starts trick is needed; a standard decaying-$\varepsilon$ schedule
-is enough, provided training runs long enough. Section~8.2 shows the learner needs on
+only) for a single run (seed 42), with $\alpha=0.1$, $\gamma=0.99$, and $\varepsilon$-greedy exploration
+decaying multiplicatively as $\varepsilon_t=\max(0.02,\,1.0\times0.9999^{\,t})$
+per episode $t$, over 50{,}000 episodes. No
+exploring starts were used: the decaying-$\varepsilon$ schedule provided
+sufficient empirical coverage for this run, and all states were visited
+during training. Section~8.2 shows the learner needs on
 the order of $10^4$ episodes to approach Value Iteration's optimum, because
 every early attempt to reach the goal must first survive the wind's variance.
-Rolled out greedily for 5{,}000 episodes, the learned policy also reaches the
-goal every time, in 20.53 steps on average, within 0.01\% of the
-optimum (Figure~\ref{fig:eval}).
+Rolled out greedily for 5{,}000 episodes (evaluation seed 3, a separate batch from Value Iteration's), the learned policy also reaches the
+goal every time, in 20.53 steps on average. Both methods produced
+approximately 20.53 steps on separate Monte Carlo evaluations; the small
+numerical difference should not be interpreted as a policy-performance
+difference (Figure~\ref{fig:eval}).
 
 \section{Comparing and Validating the Two Policies}
 
 \subsection{Performance parity}
 
-Both methods solve the task essentially perfectly: 100\% success and average
-path length within 0.01\% of each other (Figure~\ref{fig:eval}). Performance
+Both methods solve the task essentially perfectly: 100\% success, and average
+path length differs only within ordinary Monte Carlo evaluation noise
+between the two methods' separate rollout batches (Figure~\ref{fig:eval}).
+Performance
 alone does not tell the full story; the distinguishing result is the
 \emph{policy} comparison below.
 
@@ -228,15 +235,14 @@ Q-Learning's greedy policy agrees with Value Iteration's exact policy on
 least once over 50{,}000 training episodes (Figure~\ref{fig:polagree}).
 Figure~\ref{fig:gaps} shows why: the median best-vs-second-best action
 margin across the MDP is 0.83, and 64 of the 69 states have a margin of at
-least $0.1$. The margin only collapses toward zero at a small cluster of 5
-states in the two
-calm, wind-free columns farthest from the goal (rows 4--5, columns 0--2),
-where several directions are near-equivalent because there is no wind there
-to break the tie. With a clearly best action almost everywhere, a
-sampling-based learner given enough episodes converges to the same action on
-the vast majority of states; the handful of disagreements left are
+least $0.1$. The margin only collapses toward zero at a small cluster of
+low-margin states where several directions are near-equivalent because there
+is no wind there to break the tie. With a clearly best action almost
+everywhere, a sampling-based learner given enough episodes converges to the
+same action on the vast majority of states; the eight disagreements left are
 concentrated at that near-tied cluster and at states a near-optimal policy
-rarely visits, which are consequently the last to be learned.
+rarely visits, which are consequently the last to be learned
+(Figure~\ref{fig:polagree}).
 
 \begin{figure}[H]
 \centering
@@ -251,7 +257,9 @@ sharply peaked well above zero.}
 \includegraphics[width=0.78\textwidth]{fig_policy_agreement.png}
 \caption{Per-state greedy action: Value Iteration's action is shown; where
 Q-Learning disagrees, both are shown as VI/QL. Green = agreement, red =
-disagreement.}
+disagreement among non-terminal cells; the absorbing goal (marked G) is
+excluded from the 69 policy states and is not a disagreement despite its
+cell shading.}
 \label{fig:polagree}
 \end{figure}
 
@@ -270,8 +278,7 @@ same number of steps on this sample.}
 
 Figure~\ref{fig:gamma} sweeps $\gamma\in\{0.7,0.9,0.95,0.99,1.0\}$. For
 $\gamma\ge0.95$ the greedy average path length is flat at 20.37 steps,
-effectively the same policy: only 3 of 69 states differ from the
-$\gamma=0.99$ policy, all in the near-tied cluster of Section~7.2. Lowering
+effectively the same policy. Lowering
 $\gamma$ further changes the policy more substantially: at $\gamma=0.9$,
 6 of 69 states switch their optimal action and average path length
 rises to 21.37 steps; at $\gamma=0.7$, 13 of 69 states
@@ -281,8 +288,12 @@ heavily, the objective is no longer a good proxy for raw expected step count
 once the wind's stochastic branching is in play, and Value Iteration finds a
 policy that is worse in expectation under the undiscounted metric even
 though it is optimal for the smaller-$\gamma$ objective it was asked to
-solve. A deterministic MDP could not produce this effect at any
-$\gamma\in(0,1)$; Windy Gridworld's real stochasticity does.
+solve. This effect would not occur in the corresponding deterministic
+constant-step-cost shortest-path formulation; Windy Gridworld's real
+stochasticity is what produces it. (The sweep's $\gamma=1.0$ point is
+undiscounted: the return there is interpreted by its limit as $-T$ and does
+not inherit the usual discounted Bellman-contraction guarantee assumed for
+$\gamma\in(0,1)$ elsewhere in this section.)
 
 \begin{figure}[H]
 \centering
@@ -306,7 +317,7 @@ sweep shrinks the remaining error by the fixed factor $\gamma=0.99$. The
 benefit side is flat: comparing every $\theta$'s greedy policy against the
 tightest run ($\theta=10^{-12}$) gives 100\% agreement at every tested
 value, including the loosest $\theta=10^{-2}$. In this MDP the greedy policy
-is fully determined once $V$ is accurate to about two significant figures.
+was unchanged for every tested threshold, including $\theta=10^{-2}$.
 Unlike $\gamma$, which changes \emph{which} policy is optimal
 (Section~8.1), $\theta$ only trades sweeps for numerical precision that this
 task does not need; the default $\theta=10^{-10}$ used elsewhere in this
@@ -324,16 +335,23 @@ the tightest-$\theta$ policy at every setting tested (right).}
 
 \subsection{Learning rate and exploration decay}
 
-Figure~\ref{fig:alpha} sweeps Q-Learning's learning rate $\alpha$. All
+Figure~\ref{fig:alpha} sweeps Q-Learning's learning rate over the exact set
+$\alpha\in\{0.02,0.05,0.1,0.3,0.5\}$. All
 settings converge toward Value Iteration's optimum; smaller $\alpha$
 ($0.02$--$0.1$) converges to a slightly lower, steadier plateau, while larger
 $\alpha$ ($0.3$--$0.5$) is noisier and settles a little above the optimum,
 the familiar bias/variance trade-off of the running average that a Q-value
 update performs. The exploration-decay sweep
-(Figure~\ref{fig:epsilon}) shows the same overall pattern: decaying $\varepsilon$ too fast starves the
+(Figure~\ref{fig:epsilon}) uses the multiplicative schedule
+$\varepsilon_t=\max(0.02,\,\varepsilon_0 d^{\,t})$ with
+$d\in\{0.999,0.9999,0.99995\}$, and shows the same overall pattern: decaying
+$\varepsilon$ too fast ($d=0.999$) starves the
 agent of the exploration it needs to discover the shorter route around the
-wind, while a slower decay reaches the optimum in more episodes but more
-reliably.
+wind, while a slower decay ($d=0.99995$) reaches the optimum in more episodes but more
+reliably. Both sweeps train for the same 50{,}000 episodes as the main
+Q-Learning run above, each setting as a single run with seed 42 rather than
+an average over multiple seeds, and both figures plot a 100-episode moving
+average of steps to goal.
 
 \begin{figure}[H]
 \centering
@@ -365,7 +383,7 @@ toward Value Iteration's optimum (lower is better).}
 Needs a transition model & Yes: derived from the wind's known probabilities & No: only \texttt{env.step()} \\
 Environment interactions & 0 & 50{,}000 episodes ($\sim$20 steps each) \\
 Recovers the exact policy & Yes (exact expectations) & Yes, on 88.4\% of states; the optimum is not flat, so sampling suffices \\
-Reaches optimal performance & Yes (20.53 avg.\ steps) & Yes (20.53 avg.\ steps, within 0.01\%) \\
+Rollout performance & 20.53 avg.\ steps & 20.53 avg.\ steps on a separate evaluation batch \\
 Sensitive to $\gamma$'s exact value & Yes: changes the policy under real stochasticity & Inherited from the same objective \\
 Sensitive to $\theta$'s exact value & No: identical policy across all tested $\theta$ (Section~8.2) & N/A: has no stopping threshold \\
 \bottomrule
@@ -386,8 +404,9 @@ to learn from scratch.
 A transition model for the Stochastic Windy Gridworld was derived
 analytically from the wind's known probabilities and solved exactly with
 Value Iteration in 116 sweeps, reaching the goal in 20.53 steps on average.
-Q-Learning, trained without any model for 50{,}000 episodes, matched that
-performance (20.53 steps, within 0.01\%) and recovered the \emph{same}
+Q-Learning, trained without any model for 50{,}000 episodes, produced
+approximately the same rollout performance (20.53 steps, on a separate
+evaluation batch) and recovered the \emph{same}
 greedy policy on 88.4\% of states. This follows from the MDP's mostly
 sharply-peaked optimum: 64 of 69 states have an action-value margin of at
 least 0.1. The discount-factor sweep showed that, because the wind makes

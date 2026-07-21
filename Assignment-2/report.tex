@@ -193,10 +193,14 @@ removed from every unassigned variable's current domain; a domain wipe-out
 triggers backtracking.
 
 \paragraph{5. Min-Conflicts local search.}
-Greedy initial assignment then iterative repair: at each step we pick a
-variable in conflict and move it to the (station, slot) value that minimises
-post-move capacity violations, breaking ties by COP cost. After the first
-feasible state is reached the procedure keeps running to reduce $J$.
+Greedy initial assignment then iterative repair. Before feasibility, each
+step picks a variable still in conflict and ranks its candidate values first
+by post-move capacity violations and then by the COP objective $J$. After
+feasibility no conflicted variables remain, so each step instead samples a
+variable from the full fleet and accepts a move only if it strictly reduces
+$J$ without introducing a capacity violation. Exact ties are resolved by the
+first candidate in the shuffled evaluation order, so the procedure keeps
+reducing $J$ after the first feasible state is reached.
 
 % =====================================================================
 \section{Experiments}

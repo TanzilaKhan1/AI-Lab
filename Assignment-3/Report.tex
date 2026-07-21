@@ -146,6 +146,8 @@ $Q$              & 10.0           & Deposit constant; sets the reward size dropp
 \end{tabular}
 \end{table}
 
+\paragraph{Reproducibility.} The wind factor $W=0.65$ in Table~\ref{tab:params} is fixed for every scenario; what is resampled per scenario (Section~6.2) is the wind \emph{direction} $\theta \sim \mathrm{Uniform}(0, 2\pi)$, together with the road network, ignition point, and origins. Concretely, given a scenario's random seed: intersection coordinates are jittered by independent $\mathcal{N}(0, \text{Jitter}^2)$ noise in each dimension, and each of the grid's candidate road segments is independently dropped with probability equal to the roads-removed rate (Bernoulli(0.22)); the ignition point is placed a fixed distance upwind of the map centre along the freshly drawn $\theta$ and then jittered by independent $\mathcal{N}(0, (0.4\,\text{Spacing})^2)$ noise in each coordinate; the six origins and four shelters are each drawn uniformly without replacement, respectively, from the band of nodes at the 5th--25th percentile of fire-arrival time (origins, i.e.\ soon-to-be-threatened) and the band of nodes with the latest fire-arrival time (shelters, i.e.\ safest).
+
 \subsection{The overall loop}
 Putting the pieces above together, the solver repeats one loop for 120 iterations, alternating a local, per-ant construction phase with a global, per-iteration update phase:
 \begin{enumerate}[leftmargin=*]
@@ -177,7 +179,7 @@ Fire-blind shortest path & 11.715 & 57.1\% \\
 \end{table}
 
 \subsection{Statistical significance}
-Across 15 independent random scenarios (network, ignition, wind, and origins all resampled), ACO gave a mean of 3.536~h (std 0.884) against fire-aware greedy's 12.176~h (std 13.699), with a Wilcoxon signed-rank $p \approx 0.00043$, significant at 0.05. The greedy baseline's standard deviation is fifteen times ACO's because its failures are large: they leave groups trapped, which is the tail risk that matters most in an evacuation.
+Across 15 independent random scenarios (seeds 3000--3014; the road network, ignition point, wind direction, and group/shelter origins were independently resampled per scenario, while the wind factor $W=0.65$ was held fixed, see Section~5.4), ACO gave a mean of 3.536~h (std 0.884) against fire-aware greedy's 12.176~h (std 13.699), with a Wilcoxon signed-rank $p \approx 0.00043$, significant at 0.05. The greedy baseline's standard deviation is fifteen times ACO's because its failures are large: they leave groups trapped, which is the tail risk that matters most in an evacuation.
 
 \subsection{Figures}
 
@@ -204,7 +206,7 @@ Across 15 independent random scenarios (network, ignition, wind, and origins all
 % ============================================================
 \section{Discussion and Conclusion}
 
-ACO fits this problem because an evacuation route is a stepwise graph walk against a clock, and checking feasibility during construction means every plan the search considers could actually be issued. The comparison isolates the search strategy. Greedy uses the same feasibility rule and still gets trapped in dead-end pockets whose exits the fire closes, and the fire-blind baseline shows an ordinary shortest path losing a group outright. ACO's population spreads across corridors, and its pheromone concentrates on routes that are both fast and survive to the end, which cuts the mean time and, more importantly, the worst-case outcomes. Premature convergence is handled by evaporation, the stochastic transition rule, and elitist-but-eroding deposit.
+ACO fits this problem because an evacuation route is a stepwise graph walk against a clock, and checking feasibility during construction means every plan the search considers could actually be issued. All three methods are evaluated under the same crossing rule. However, the comparison also reflects differences in planning strategy and access to fire-arrival information, because the fire-blind baseline does not use the fire model during route selection: it plans a single shortest path with no fire information at all and is checked against the fire clock, hop by hop, only after that route has already been chosen, and none of the three methods replans once under way. Greedy uses the same feasibility rule and still gets trapped in dead-end pockets whose exits the fire closes, and the fire-blind baseline shows an ordinary shortest path losing a group outright. ACO's population spreads across corridors, and its pheromone concentrates on routes that are both fast and survive to the end, which cuts the mean time and, more importantly, the worst-case outcomes. Premature convergence is handled by evaporation, the stochastic transition rule, and elitist-but-eroding deposit.
 
 % ============================================================
 \section*{References}
