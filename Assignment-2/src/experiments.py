@@ -100,7 +100,7 @@ def _make_plots(df: pd.DataFrame) -> None:
         "Min-Conflicts": "#a855f7",
     }
 
-    def _line(metric, ylabel, log, fname):
+    def _line(metric, ylabel, log, fname, *, title=None):
         fig, ax = plt.subplots(figsize=(11, 6))
         d = df.copy()
         if metric in {"cost", "travel_km", "wait_min"}:
@@ -111,14 +111,20 @@ def _make_plots(df: pd.DataFrame) -> None:
             ax.set_yscale("log")
         ax.set_xlabel("Number of vehicles N")
         ax.set_ylabel(ylabel)
-        ax.set_title(ylabel + " vs problem size")
+        ax.set_title(title or (ylabel + " vs problem size"))
         ax.legend(title="", loc="best", frameon=True)
         fig.tight_layout()
         fig.savefig(FIGS / fname, dpi=160)
         plt.close(fig)
 
     _line("time_s", "Wall-clock time (s)", True, "runtime_vs_size.png")
-    _line("nodes", "Nodes expanded", True, "nodes_vs_size.png")
+    _line(
+        "nodes",
+        "Method-specific candidate evaluations",
+        True,
+        "nodes_vs_size.png",
+        title="Method-specific candidate evaluations",
+    )
     _line("travel_km", "Total travel distance (km)", False, "travel_vs_size.png")
     _line("wait_min", "Total wait time (min)", False, "wait_vs_size.png")
     _line("cost", "COP objective J", False, "cost_vs_size.png")

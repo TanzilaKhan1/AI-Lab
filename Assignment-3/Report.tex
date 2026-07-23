@@ -94,7 +94,7 @@ One ant proposes one full evacuation plan: for each group, an ordered list of in
 \text{cross}(u \to v \text{ at } t) \iff
 t \le t_{\text{fire}}(u) - m \;\wedge\; t + t_{uv} \le t_{\text{fire}}(v) - m,
 \end{equation}
-with safety margin $m$. It is checked at every construction hop, so no infeasible plan is ever built, and an ant that reaches a dead end returns a failed route. Every generated scenario is checked as solvable by a fire-aware Dijkstra oracle before use.
+with safety margin $m$. It is checked at every construction hop, so no infeasible plan is ever built, and an ant that reaches a dead end returns a failed route. Every generated scenario is checked for solvability by a fire-aware Dijkstra feasibility check before use; this check is used only as a scenario-solvability filter, not as a reported objective baseline.
 
 \subsection{Objective}
 Minimize the total penalized evacuation time,
@@ -179,7 +179,7 @@ Fire-blind shortest path & 11.715 & 57.1\% \\
 \end{table}
 
 \subsection{Statistical significance}
-Across 15 independent random scenarios (seeds 3000--3014; the road network, ignition point, wind direction, and group/shelter origins were independently resampled per scenario, while the wind factor $W=0.65$ was held fixed, see Section~5.4), ACO gave a mean of 3.536~h (std 0.884) against fire-aware greedy's 12.176~h (std 13.699), with a Wilcoxon signed-rank $p \approx 0.00043$, significant at 0.05. The greedy baseline's standard deviation is fifteen times ACO's because its failures are large: they leave groups trapped, which is the tail risk that matters most in an evacuation.
+Across 15 independent random scenarios (seeds 3000--3014; the road network, ignition point, wind direction, and group/shelter origins were independently resampled per scenario, while the wind factor $W=0.65$ was held fixed, see Section~5.4), ACO gave a mean of 3.536~h (std 0.884) against fire-aware greedy's 12.176~h (std 13.699). The paired Wilcoxon signed-rank test (\texttt{scipy.stats.wilcoxon}) was run under its default configuration: a two-sided alternative, the \texttt{wilcox} zero-difference handling rule, and automatic method selection, which computes the exact null distribution for this sample size ($n=15$) unless ties or zero differences among the paired scores force a fallback to the normal approximation, giving $p \approx 0.00043$, significant at 0.05; the test statistic and an effect-size measure were not retained from the run and are not reported here. The fixed trap penalty amplifies the variance of penalty-bearing failures, which is the tail risk that matters most in an evacuation; the number of scenarios in which each method trapped a group was not separately retained, so no claim is made about a lower trapping frequency for ACO.
 
 \subsection{Figures}
 

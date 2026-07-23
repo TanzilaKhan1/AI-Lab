@@ -159,8 +159,8 @@ Station coordinates are pulled from OpenStreetMap via the Overpass API:
 \texttt{[out:json][timeout:60]; (node["amenity"="fuel"](bbox); way["amenity"="fuel"](bbox);); out center;}
 \end{quote}
 The Dhaka bbox is $(23.65, 90.32, 23.92, 90.52)$. A total of 248 fuel
-stations are returned, of which 18 are kept as the active per-day subset
-to reflect supply rationing (Figure~\ref{fig:dhakamap}).
+stations are returned, of which 18 are kept as the active per-day subset,
+selected to create a controlled scarcity scenario (Figure~\ref{fig:dhakamap}).
 
 \begin{figure}[H]
 \centering
@@ -256,9 +256,10 @@ Python 3.12, single-thread.
         size in $<1.2$\,s on average.
   \item \textbf{LCV} helps when one or two tight cells dominate; gains are
         modest when many cells are equally pressed. Best at intermediate $N$.
-  \item \textbf{Forward Checking} prunes one cell at a time; against the
-        \emph{global} capacity constraint here, it spends most of its time
-        thrashing when $N\ge 75$. Best between $N{=}30$ and $N{=}50$.
+  \item \textbf{Forward Checking} spends most of its time thrashing when
+        $N\ge 75$; this behavior is consistent with its cell-level pruning
+        being poorly matched to the \emph{global} capacity constraint here.
+        Best between $N{=}30$ and $N{=}50$.
   \item \textbf{Min-Conflicts} reaches a feasible state in well under one
         second at every size and keeps reducing $J$ on the post-feasibility
         loop. It also produces the lowest total travel distance because its
@@ -272,8 +273,10 @@ Python 3.12, single-thread.
 We modelled Dhaka's 2026 fuel-rationing operation as a CSP with a COP escape
 hatch, anchored the parameters to BPC and Fuel-Pass BD policy documents, and
 built an end-to-end pipeline from OSM station extraction to algorithm
-benchmarking. Forward Checking is the best complete solver in the
-mid-range; for realistic city-wide scales Min-Conflicts is the only
+benchmarking. Forward Checking is the strongest systematic backtracking
+configuration tested in the mid-range (every run was stopped at a 10\,s
+wall-clock budget, so no configuration's completeness was exercised without
+a cutoff); for realistic city-wide scales Min-Conflicts is the only
 practical choice and is the only solver whose tie-breaker actually optimises
 travel and wait time.
 

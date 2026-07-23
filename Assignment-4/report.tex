@@ -97,7 +97,7 @@ number of remaining steps $T$ is $-\,\frac{1-\gamma^T}{1-\gamma}$, which as a
 function of the step count $T$ is decreasing and convex (equivalently, the
 accumulated cost $\frac{1-\gamma^T}{1-\gamma}$ is increasing and concave in
 $T$). In a \emph{deterministic} shortest-path problem,
-$T$ is fixed by the policy, so any $\gamma\in(0,1)$ ranks policies
+each fixed policy induces a fixed completion time $T$, so any $\gamma\in(0,1)$ ranks policies
 identically: $\gamma$ only has to be strictly less than 1. Here $T$ is a
 \emph{random variable} (the wind), so a policy's value is
 $\mathbb{E}\!\left[-\frac{1-\gamma^T}{1-\gamma}\right]=-\frac{1-\mathbb{E}[\gamma^T]}{1-\gamma}$,
@@ -384,7 +384,7 @@ Needs a transition model & Yes: derived from the wind's known probabilities & No
 Environment interactions & 0 & 50{,}000 episodes ($\sim$20 steps each) \\
 Recovers the exact policy & Yes (exact expectations) & Yes, on 88.4\% of states; the optimum is not flat, so sampling suffices \\
 Rollout performance & 20.53 avg.\ steps & 20.53 avg.\ steps on a separate evaluation batch \\
-Sensitive to $\gamma$'s exact value & Yes: changes the policy under real stochasticity & Inherited from the same objective \\
+Sensitive to $\gamma$'s exact value & Yes: changes the policy under real stochasticity & Not separately tested; Q-Learning optimizes the same discounted objective \\
 Sensitive to $\theta$'s exact value & No: identical policy across all tested $\theta$ (Section~8.2) & N/A: has no stopping threshold \\
 \bottomrule
 \end{tabularx}

@@ -1,0 +1,57 @@
+\begin{table}[H]
+\centering
+\small
+% Author note: the "3 seeds" figure below was a caption error, not a data
+% error. REPEATS=5 in src/experiments.py, and results/experiments.csv
+% confirms 5 distinct seeds per problem size (e.g. N=100: 2000-2004).
+% Verified 2026-07-22; corrected to 5 seeds.
+\caption{Mean wall-clock time (s) per solver per problem size — 5 seeds, 10\,s budget.}
+\label{tab:time}
+\begin{tabular}{lrrrrrr}
+\toprule
+Algorithm & $N{=}10$ & $N{=}20$ & $N{=}30$ & $N{=}50$ & $N{=}75$ & $N{=}100$ \\
+\midrule
+BT {+} Forward Checking & 0.000 & 0.000 & 0.001 & 0.068 & 8.126 & 8.140 \\
+BT {+} LCV & 0.000 & 0.000 & 0.000 & 0.001 & 8.003 & 10.003 \\
+BT {+} MRV & 0.001 & 0.006 & 0.014 & 0.061 & 0.191 & 0.425 \\
+Backtracking & 0.000 & 0.000 & 2.000 & 6.001 & 10.003 & 10.002 \\
+Min-Conflicts & 1.462 & 1.767 & 1.590 & 1.867 & 1.946 & 1.982 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Mean nodes expanded per solver (a search-effort proxy).}
+\label{tab:nodes}
+\begin{tabular}{lrrrrrr}
+\toprule
+Algorithm & $N{=}10$ & $N{=}20$ & $N{=}30$ & $N{=}50$ & $N{=}75$ & $N{=}100$ \\
+\midrule
+BT {+} Forward Checking & 10 & 20 & 31 & 1,582 & 207,198 & 118,007 \\
+BT {+} LCV & 11 & 34 & 68 & 221 & 4,964,516 & 5,728,481 \\
+BT {+} MRV & 12 & 45 & 68 & 263 & 813 & 1,759 \\
+Backtracking & 12 & 45 & 2,675,433 & 5,568,584 & 5,353,599 & 9,353,369 \\
+Min-Conflicts & 843,202 & 1,006,792 & 855,906 & 1,027,812 & 1,036,396 & 1,025,572 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Success rate (fraction of seeds in which a zero-conflict assignment was returned).}
+\label{tab:solved}
+\begin{tabular}{lrrrrrr}
+\toprule
+Algorithm & $N{=}10$ & $N{=}20$ & $N{=}30$ & $N{=}50$ & $N{=}75$ & $N{=}100$ \\
+\midrule
+BT {+} Forward Checking & 1.00 & 1.00 & 1.00 & 1.00 & 0.20 & 0.20 \\
+BT {+} LCV & 1.00 & 1.00 & 1.00 & 1.00 & 0.20 & 0.00 \\
+BT {+} MRV & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+Backtracking & 1.00 & 1.00 & 0.80 & 0.40 & 0.00 & 0.00 \\
+Min-Conflicts & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
