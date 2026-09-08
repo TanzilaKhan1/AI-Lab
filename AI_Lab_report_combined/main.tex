@@ -1,0 +1,490 @@
+% Compile with pdfLaTeX and BibTeX
+\documentclass{ai-lab-report}
+
+\title{Empirical Case Studies of Classical AI Methods Under Spatial Risk, Resource Scarcity, Expiring Feasibility, and Stochastic Dynamics}
+\reportemail{tanzila-2021011201@cs.du.ac.bd}
+\author{Tanzila Khan}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This report examines how application-motivated constraints affect the empirical behavior and theoretical guarantees of four classical AI paradigms. Four computational case studies evaluate risk-biased heuristic search on a Dhaka OpenStreetMap graph, constraint-based synthetic fuel allocation, ACO routing on wildfire-affected road networks with time-dependent feasibility, and value iteration versus Q-learning in a stochastic windy gridworld. On one routing instance, A* reached the UCS-optimal path with fewer expansions; a risk-biased heuristic reduced A* expansions at the cost of optimality but worsened greedy search. Across five allocation instances per size, MRV backtracking and min-conflicts solved all cases up to 100 vehicles, whereas the other backtracking configurations failed to solve all cases within the time limit. Across 15 wildfire scenarios, ACO achieved 3.536 mean penalized group-hours versus 12.176 for fire-aware greedy (paired Wilcoxon signed-rank test, $p\approx0.00043$). In one Q-learning run, 61 of 69 greedy actions agreed with value iteration and the policies produced numerically similar rollout means; a value-iteration sweep showed that changing $\gamma$ altered the optimal policy under a random horizon. Overall, classical guarantees were most informative when their assumptions and computational budgets closely matched the applied formulation, a cross-case observation rather than a universal result, with conclusions limited by each study's replication depth.
+\end{abstract}
+
+\keywords{Search algorithms; heuristic search; constraint satisfaction; local search; ant colony optimization; reinforcement learning; Markov decision processes; disaster response planning}
+\par\vspace{5mm}
+\noindent\rule{\textwidth}{0.4pt}
+\section{Introduction}
+
+Classical AI methods provide formal guarantees under explicit assumptions about objectives, state representations, feasibility, dynamics, and computation: uniform-cost and heuristic search can be optimal under suitable cost and heuristic conditions, systematic constraint search is complete without an external termination limit, dynamic programming provides model-based solutions when transition probabilities are known, and reinforcement-learning algorithms have asymptotic convergence results under specified sampling and learning-rate conditions. This report examines how changes in representation, feasibility, resource availability, and transition knowledge affect the empirical behavior and interpretation of those guarantees across four computational case studies. It does not propose a new general-purpose search, constraint-solving, metaheuristic, or reinforcement-learning algorithm; instead, it uses implemented comparisons to study four recurring issues: objective alignment, computational limits, time-dependent feasibility, and the trade-off between model knowledge and sampled interaction. The contribution is a common framework for these issues together with an evidence-based synthesis that distinguishes formal algorithmic properties from behavior observed on finite instances under finite budgets.
+
+Study I compares uninformed and heuristic search on a directed OpenStreetMap road graph of Dhaka. Distance remains the formal objective, while a synthetic spatial-risk signal changes heuristic ordering and is also used to calculate a separate post hoc evaluation score. The test for the experiment is then to investigate the influence of a secondary signal on path quality, search effort, and the level of optimality guarantee for admissible and consistent heuristics. Study II models synthetic fuel allocation as a capacity-constrained station-slot assignment problem, and assesses the performance of plain backtracking, MRV, LCV, forward checking, and min-conflicts as the number of vehicles increases. It looks at the impact on solver success of variable ordering, inference, local repair and an external time limit. Study III considers evacuation routing on generated road networks whose feasible edges expire as a directional wildfire-arrival field advances. ACO is compared with an information-matched fire-aware greedy method and a contextual fire-blind shortest-path baseline. The study examines route construction when locally feasible decisions may still lead to later dead ends. In the next study (IV), both value iteration and Q-learning are compared on a stochastic windy gridworld. Value iteration is based on the analytically obtained transition model while Q-learning learns through interaction with the simulator. This comparison focuses on the finite-sample policy agreement, policy rollout behavior and the role of the discount factor on optimal policy when completion time is random.
+
+The four studies have varying experimental evidence. In Study I, a single origin--destination pair is studied; in Study II, five vehicle-population realizations per problem size are studied in a single active-station scenario family; in Study III, fifteen scenarios are generated and evaluated by a single run of stochastic ACO per scenario; in Study IV, one main Q-learning run with separate Monte Carlo evaluation batches. There is no numerical comparison with computational effort across studies because search expansions, evaluations of candidates for constraint solvers, iterations of ACO, and episodes of Q-learning are different operations.
+
+Section 2 reviews the literature for the four studies. Sections 3--6 present their formulations, methods, and results. Section 7 provides the cross-study synthesis and limitations, and Section 8 concludes. Mathematical notation is local to each study; symbols reused across sections do not denote the same parameters unless stated otherwise.
+
+\section{Literature Review}
+
+\subsection{Uninformed and Informed Search (Study I)}
+
+Common uninformed search methods for a state space are depth-first search, breadth-first search, uniform-cost search, and iterative deepening search. Uniform-cost search is optimal for graphs where the edge costs are non-negative, and breadth-first search is optimal only in terms of number of edges traversed if the step costs are uniform \citep{russell2021ai}. Informed search is based on an estimate of the cost from node $n$ to the goal, called a heuristic, $h(n)$. Greedy best-first search expands nodes according to $h(n)$ alone, while A* uses
+$f(n)=g(n)+h(n)$. In the case of tree search, cost-optimal is achieved if the heuristic is admissible, and graph-search optimality is also achieved if the heuristic is consistent or if the implementation reopens the states if a lower-cost path is found \citep{hart1968formal}. Weighted A* instead uses
+$f(n)=g(n)+w h(n)$ for $w>1$, generally reducing search effort by accepting the possibility of a suboptimal solution \citep{pohl1970heuristic,russell2021ai}. Theoretical variants of A*-family methods and their application in pathfinding are described in reviews \citep{foead2021systematic}.
+
+Typically, urban routing problems add a safety or risk criterion to the shortest-path formulation. Galbrun, Pelechrinis and Terzi build crime-risk scores on road networks from OpenStreetMap and redefine safe navigation as a biobjective shortest-path problem, which returns routes that reflect various distance--risk trade-offs \citep{galbrun2016safepaths}. Krumm and Horvitz estimate the probability of a crash on a road segment, and calculate routes that balance the probability of a crash with travel time \citep{krumm2017riskaware}. Theron and Breetzke identify safer routes based on historical crimes, facilities associated with crime or both, with the latter formulation being especially important in cases where there is not enough detailed crime data available \citep{theron2024safest}. Together, this literature frames urban safe routing mainly as risk-minimizing or multiobjective shortest-path search, while A*-family theory clarifies when heuristic guidance preserves or relaxes cost optimality.
+
+\subsection{Constraint Satisfaction and Local Search (Study II)}
+
+A constraint satisfaction problem (CSP) is a set of variables with domains and constraints that specify which combinations of values are allowed. Systematic backtracking search is complete if there is no external termination limit, but it has exponential worst-case time. It is highly dependent upon variable-ordering heuristics such as minimum remaining values (MRV) and least constraining value (LCV), and inference procedures such as forward checking \citep{haralick1980increasing,russell2021ai}. Local-search methods work on complete, possibly inconsistent assignments. Min-conflicts repeatedly fixes constraint violations and is known to be highly scalable on problems that are not easily addressed with systematic search \citep{minton1992conflicts}. Reproducible comparisons between constraint models, constraint-solvers and search heuristics are possible with the use of standardized formats and benchmark ecosystems like XCSP3 \citep{audemard2020xcsp3}. The station-slot capacity restriction is related to the global cardinality constraint, which limits the number of variables that can be assigned to any given value, and provides specialized consistency filtering \citep{regin1996global}. The allocation model is related to a well-known class of capacity-constrained assignment problems, but the present study compares general-purpose search configurations rather than implementing a dedicated global-cardinality propagator.
+
+The station-slot allocation structure used in Study II is similar to that in constrained scheduling and resource assignment. Chun models train assignment to outstabling sites and working hours as a CSP with interacting spatial, temporal, and engineering constraints \citep{chun2013outstable}. Research on appointment scheduling also allocates customers to service times, but under the constraint of waiting-time or service-level requirements \citep{benjaafar2023appointment}. The SoftCumulative constraint allows for temporary capacity overloads but penalizes the size of the violation, giving a formal precedent to optimization models in which capacity violations incur large but finite penalties \citep{ouellet2022softcumulative}.
+
+Taken together, these works place fuel-rationing-style station-slot allocation within the broader literature on capacity-constrained assignment, soft-capacity optimization, and heuristic CSP search.
+
+\subsection{Ant Colony Optimization and Population-Based Metaheuristics (Study III)}
+
+Ant Colony Optimization (ACO) is a population-based constructive metaheuristic, proposed by Dorigo, Maniezzo and Colorni \citep{dorigo1996antsystem}. Artificial ants generate candidate solutions by incrementally building up pheromone information from previous solutions, and a local heuristic that measures the immediate desirability. Pheromone reinforcement makes components of high-quality solutions more likely to be reused, and evaporation makes previously made decisions less influential. In addition, Ant Colony System introduces pseudo random-proportional action selection and local pheromone updates \citep{dorigo1997acs} while MAX--MIN Ant System restricts pheromone values to avoid stagnation and premature convergence \citep{stutzle2000maxmin}. The resulting ACO variants are covered in broader reviews in the areas of routing, scheduling and combinatorial optimization \citep{dorigo2019aco}. The No Free Lunch theorem does not allow a statement that ACO is generally superior, but only that it is justified by the correspondence between the constructive search process performed by ACO, and the structure of the target problem \citep{wolpert1997nofreelunch}.
+
+The time-dependent feasibility model in Study III is motivated by established wildfire-spread research. Rothermel's rate-of-spread model provides a foundational representation of wildland-fire propagation \citep{rothermel1972spread}. Richards develops an elliptical fire-front formulation for directionally influenced spread \citep{richards1990elliptical}, and FARSITE combines such fire-behavior components in an operational spatial simulator \citep{finney1998farsite}. Study III uses these works as conceptual background for fire-arrival times but implements a substantially simpler cosine-modulated directional field. It is therefore a controlled routing environment rather than an operational wildfire forecast.
+
+ACO has previously been applied to several evacuation settings. Indoor studies include sensor-responsive evacuation routing and improved ACO methods for building fires \citep{xu2022evacuation}, as well as bidirectional ACO combined with A* for high-rise evacuation \citep{wang2022bidirectional}. Samadzadegan, Zarrinpanjeh, and Schenk apply ACO to route selection in an outdoor disaster-affected urban area using static post-disaster damage costs \citep{samadzadegan2011aco}. Goto et al.\ develop an ACO-based wide-area evacuation-guidance system that directs evacuees away from danger zones in a tsunami- and earthquake-motivated outdoor scenario \citep{goto2016guidance}. These studies establish that ACO evacuation is not restricted to indoor environments, although their hazard and feasibility models differ from the continuously advancing road-expiration mechanism considered here.
+
+Beyond evacuation applications, ACO has also been adapted to shortest-path search in dynamic and stochastic networks. Yu, Li, and Wu proposed a temporal ACO method for networks whose parameters change over time, demonstrating the broader relevance of pheromone-based adaptation to dynamic routing \citep{yu2010temporal}. Their formulation addresses temporally changing network conditions, whereas the present study imposes explicit fire-arrival deadlines and filters every candidate road traversal for feasibility during route construction.
+
+Recent wildfire-routing research increasingly models dynamic hazards, traffic, and network availability. Zhang, Tan, and Tiong combine SAR imagery with intelligent optimization for grassland-fire evacuation routing \citep{zhang2025grassland}. RESCUE represents wildfire evacuation as routing on a time-varying graph with evolving spread and congestion and formulates the task as a multiobjective shortest-path problem \citep{tammali2026rescue}. Raei et al.\ use GPS-informed mobility patterns, fire risk, congestion, and a dynamic Dijkstra--A* method to evaluate staggered evacuation strategies for the 2023 McDougall Creek wildfire \citep{raei2026mcdougall}. In separate work, Raei, Safarzadeh, and Wang develop congestion-aware multi-agent reinforcement learning on a real road network with capacity-limited corridors and advancing fire risk \citep{raei2026congestion}. Beyki et al.\ integrate fire spread, multimodal transport, fire-induced road closures, and adaptive rerouting within a modular agent-based evacuation framework \citep{beyki2026modular}.
+
+Prior research has therefore applied ACO to both indoor and outdoor disaster evacuation and has addressed wildfire routing with dynamic road availability using other optimization and learning methods, although these strands typically differ in hazard modeling, routing assumptions, and operational detail.
+
+\subsection{Markov Decision Processes: Model-Based and Model-Free Learning (Study IV)}
+
+A Markov decision process (MDP) represents sequential decision-making through states, actions, transition probabilities, rewards, and a policy. When the transition model is known, the optimal value function satisfies the Bellman optimality equation \citep{russell2021ai}:
+\begin{equation}
+U(s)
+=
+\max_a
+\sum_{s'}
+P(s' \mid s,a)
+\left[
+R(s,a,s')+\gamma U(s')
+\right].
+\label{eq:bellman}
+\end{equation}
+Value iteration approximates the fixed point of this equation through repeated dynamic-programming updates. Q-learning estimates the corresponding optimal action values from sampled transitions without requiring an explicit transition table. It is model-free and off-policy because its update uses
+$\max_{a'}Q(s',a')$ independently of the exploratory action selected by the behavior policy \citep{watkins1992qlearning,sutton2018rl}. Classical stochastic-approximation results give conditions under which Q-learning-style updates converge almost surely, including requirements concerning learning rates, sampling, and repeated state--action updates \citep{jaakkola1994convergence}.
+
+The episodic gridworld in Study IV is closely related to a stochastic shortest-path (SSP) problem because the agent accumulates transition costs until reaching an absorbing goal. Bertsekas and Tsitsiklis establish foundational dynamic-programming results for finite-state SSPs under total expected cost \citep{bertsekas1991ssp}. Yu and Bertsekas develop convergent algorithms combining Q-learning with policy-iteration ideas for SSPs \citep{yu2013qlearning}, while their boundedness analysis supplies an important part of the convergence argument for asynchronous Q-learning iterates under standard SSP conditions \citep{yu2013boundedness}. These results apply to asymptotic algorithms with explicit assumptions about stochastic approximation, and are different from finite training runs with fixed learning rates and nonzero exploration floors. The discount factor $\gamma$ affects both the relative weight placed on delayed rewards and the contraction rate of discounted dynamic programming \citep{sutton2018rl}. In a deterministic constant-step-cost problem, every fixed policy induces a fixed completion time, so changing $\gamma \in (0,1)$ preserves the ordering of those completion times. In a stochastic environment, completion time is a random variable, and the discounted objective depends on its distribution rather than only its expectation. Related SSP work demonstrates that policies can be different from those favored by an undiscounted reachability-and-cost criterion when discounting is introduced \citep{teichteil2012stochastic}. More broadly, model-based methods rely on or learn transition models while model-free methods estimate policies or value functions from interaction data \citep{moerland2023modelbased}. Overall, this literature distinguishes model-based dynamic programming from model-free sampled control and shows that stochastic completion times and discounting can affect policy choice.
+
+\subsection{Summary and Experimental Focus}
+
+The literature has laid the groundwork for mature theory for each of these paradigms and application-specific extensions into safe routing, constrained allocation, dynamic evacuation, and stochastic shortest-path control. In this report, each study investigates one application-motivated modification to a classic formulation and its impact on the quality of the solutions, their computational characteristics and the practical interpretation of the classic guarantees. Claims can thus be limited to the models implemented and to the replication depth reported in each of the studies.
+
+\section{Study I: Risk-Biased Heuristic Search on a Dhaka Road Network}
+
+\subsection{Problem Formulation}
+The drivable road network of Dhaka is loaded from OpenStreetMap with OSMnx \citep{boeing2017osmnx} as a directed multigraph $G=(V,E)$ with $|V|=103{,}514$ nodes and $|E|=253{,}642$ edges (mean out-degree $\approx 2.45$), each edge carrying its length in meters. Every node $n$ is assigned a risk score $r(n)\in[0,1]$ built from six factors extracted from the same OpenStreetMap query: police stations, hospitals, and fire stations lower risk within a decay radius, while bus terminals, marketplaces, and railway level crossings raise it. A seventh synthetic risk component is added: a fixed 3\% random sample of nodes (drawn with seed 42), treated as synthetic latent-hazard nodes representing unobserved spatial risk. Each factor $k$ contributes
+\begin{equation}
+c_k(n) = \sigma_k\, w_k\, \max\!\Big(0,\, 1-\tfrac{d_k(n)}{R_k}\Big),
+\label{eq:a1-risk-factor}
+\end{equation}
+where $d_k(n)$ is the distance to the nearest instance of factor $k$, $\sigma_k\in\{+1,-1\}$ its polarity, $w_k$ its weight, and $R_k$ its radius of influence, and the node risk is
+\begin{equation}
+r(n)=\mathrm{clip}\Big(\big(r_{\text{base}} + \textstyle\sum_k c_k(n) + \mathbb{1}[n\in H]\,r_{\text{haz}}\big)\,\tau,\,0,\,1\Big)
+\label{eq:a1-risk-score}
+\end{equation}
+with baseline $r_{\text{base}}=0.20$, hazard bump $r_{\text{haz}}=0.50$, and time-of-day multiplier $\tau=1.0$ in all reported runs. Edge risk is the average of its endpoints' risk. Over the extracted graph, mean node risk is $\bar r = 0.201$, computed using 221 police stations, 850 hospitals, 53 fire stations, 231 bus stations, 985 marketplaces, and 894 level crossings. The six factors' polarities, weights, and radii of influence are listed in Table~\ref{tab:a1-factors}. The weights, radii, and 3\% hazard rate form a controlled synthetic proxy rather than a validated Dhaka risk index.
+
+\begin{table}[H]
+\centering
+\small
+\caption{The six risk factors of Equation~\eqref{eq:a1-risk-factor}: polarity $\sigma_k$, weight $w_k$, and radius of influence $R_k$. Safety amenities lower risk ($\sigma_k=-1$); congestion and crossing points raise it ($\sigma_k=+1$).}
+\label{tab:a1-factors}
+\begin{tabular}{lrrr}
+\toprule
+Factor $k$ & Polarity $\sigma_k$ & Weight $w_k$ & Radius $R_k$ (m) \\
+\midrule
+Police station  & $-1$ & 0.30 & 500 \\
+Hospital        & $-1$ & 0.25 & 400 \\
+Fire station    & $-1$ & 0.15 & 500 \\
+Bus station     & $+1$ & 0.25 & 400 \\
+Marketplace     & $+1$ & 0.20 & 300 \\
+Level crossing  & $+1$ & 0.30 & 150 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two costs are tracked for every path $\pi$: the \emph{search cost}
+\begin{equation}
+G_d(\pi)=\sum_{(u,v)\in\pi}\ell(u,v),
+\label{eq:a1-search-cost}
+\end{equation}
+the common path-distance metric reported for every method (UCS and A* with an admissible and consistent heuristic are guaranteed to minimize it; the other methods may return a non-optimal $G_d$ path), and a \emph{synthetic risk-adjusted evaluation score}
+\begin{equation}
+G_a(\pi) = \sum_{(u,v)\in\pi} \ell(u,v)\big(1+\alpha\, r(u,v)\big)\,T\,\varepsilon_{uv}, \qquad \varepsilon_{uv}\sim\mathrm{Uniform}(0.9,1.15),
+\label{eq:a1-actual-cost}
+\end{equation}
+that inflates each edge by its risk, a time-of-day multiplier $T$, and a per-edge noise term $\varepsilon_{uv}$, applied only after a path has been chosen, to generate a controlled post hoc score combining route length, synthetic risk and multiplicative noise under risk weight $\alpha$ (fixed at 1.5 for the main comparison) and time-of-day multiplier $T$ (fixed at 1.0), with the per-edge noise $\varepsilon_{uv}$ drawn from a fixed seed so that $G_a$ is reproducible for a given path. The task is to find a path from a fixed start to a fixed goal (separated by at least 250 edges, selected reproducibly with seed 7) that minimizes $G_d$, and to compare how seven search algorithms and three heuristics trade off $G_d$, $G_a$, and search effort; distance $G_d$ remains the search objective throughout, and no algorithm here solves a risk-minimizing or multiobjective routing problem. This is a single-instance, city-scale case study: every comparison below is conditioned on the one fixed origin--destination pair described above, and its conclusions are illustrative for this instance rather than general claims about Dhaka's road network.
+
+\subsection{Methodology}
+Three heuristics estimate the remaining distance to the goal $g$: the planar Euclidean distance $h_E$, the haversine great-circle distance $h_H$, and a risk-weighted distance $h_W(n)=h_E(n)\big(1+w\,r(n)\big)$ with $w=2.0$, where $r(n)$, defined in Equation~\eqref{eq:a1-risk-score}, aggregates the contributions from Equation~\eqref{eq:a1-risk-factor} together with the baseline and synthetic-hazard terms. Haversine distance $h_H$, computed on the Earth's curved surface, serves as the geographically grounded admissible reference, since a great-circle arc is never longer than a road route. For graph-search A* to inherit this as the formal optimality guarantee invoked in this report, $h_H$ must also be consistent: for every road edge $(u,v)$, its OSM length $\ell(u,v)$ is no shorter than the great-circle distance between its endpoints, so the triangle inequality gives $h_H(u)\le \ell(u,v)+h_H(v)$, making $h_H$ consistent as well as admissible. The planar Euclidean approximation $h_E$ is treated as an approximate lower-bound heuristic, since its exact lower-bound property on projected coordinates is not independently established here, though the results below show it behaves almost identically to $h_H$ on this city-scale instance. $h_W$ is deliberately inadmissible, since inflating the estimate by local risk can make it exceed the true remaining cost, and is included to examine the cost of biasing the heuristic. $h_W$ changes expansion order, whereas the separate parameter $\alpha$ affects only the post hoc score $G_a$.
+
+Seven algorithms are implemented against a common interface over the same graph: depth-first search (DFS), breadth-first search (BFS), iterative deepening search (IDS, tree-search with a 30-second wall-clock cap and a depth limit of 500), uniform-cost search (UCS, equivalent to Dijkstra), greedy best-first search, A*, and weighted A* with $w=1.5$. Greedy, A*, and weighted A* are each run with all three heuristics, so the comparison contrasts uninformed and heuristic-guided search, as well as admissible and deliberately biased heuristics, on a single fixed instance. For every run, we record the path depth, $G_d$, $G_a$, nodes expanded, peak frontier size, wall-clock runtime, and the effective branching factor $b^\star$, obtained by solving
+\begin{equation}
+N+1=\sum_{i=0}^{d}(b^\star)^i
+\label{eq:a1-branching-factor}
+\end{equation}
+for the observed expansion count $N$ and solution depth $d$; this is an idealized summary of expansion count relative to solution depth as if search proceeded over a regular tree, and it is not an estimate of the road graph's physical out-degree, since these are graph-search implementations with duplicate detection, irregular vertex degree, and heuristic-dependent path depths. Wall-clock measurements were collected from the common full-comparison run reported in Table~\ref{tab:a1-all} and may differ from separately instrumented runs used to render the expansion-order figures; expansion counts and path costs are the primary reproducible metrics, and small runtime differences between logged runs should not be over-interpreted.
+
+\subsection{Results and Discussion}
+
+The Euclidean- and Haversine-guided A* runs returned the same path as UCS; the risk-weighted A* run returned a longer path (Figure~\ref{fig:a1-astar}). Only the Haversine configuration carries the established optimality guarantee used here. BFS's fewest-hops path is approximately 34\% longer in distance than the optimum, and the DFS path is 15.49 times as long, illustrating the divergence between hop-count and distance optimality under uninformed search (Figure~\ref{fig:a1-uninformed}).
+\begin{table}[H]
+\centering
+\small
+\caption{Results for the seven algorithm families and all tested heuristic configurations, on the same Dhaka start/goal pair. Where a heuristic applies, it is appended to the algorithm name.}
+\label{tab:a1-all}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Algorithm / heuristic & Depth & $G_d$ (m) & $G_a$ (m) & Expanded & Max front. & Runtime (s) & $b^\star$ \\
+\midrule
+BFS & 263 & 232{,}131 & 318{,}088 & 102{,}591 & 1{,}169 & 0.20 & 1.031 \\
+DFS & 10{,}928 & 2{,}690{,}529 & 3{,}633{,}277 & 45{,}764 & 7{,}709 & 0.11 & 1.000 \\
+UCS & 399 & 173{,}686 & 235{,}615 & 101{,}165 & 483 & 0.44 & 1.019 \\
+IDS & \multicolumn{7}{l}{\small NOT FOUND (expanded = 45{,}650{,}247, 30.0\,s timeout)} \\
+Greedy / Euclidean & 567 & 245{,}694 & 339{,}917 & 1{,}284 & 472 & 0.01 & 1.003 \\
+Greedy / Haversine & 567 & 245{,}694 & 339{,}917 & 1{,}284 & 472 & 0.01 & 1.003 \\
+Greedy / Risk-weighted & 973 & 265{,}955 & 346{,}434 & 14{,}110 & 1{,}265 & 0.06 & 1.004 \\
+A* / Euclidean & 399 & 173{,}686 & 235{,}615 & 67{,}049 & 1{,}300 & 0.49 & 1.018 \\
+A* / Haversine & 399 & 173{,}686 & 235{,}615 & 67{,}236 & 1{,}305 & 0.48 & 1.018 \\
+A* / Risk-weighted & 490 & 190{,}383 & 255{,}562 & 50{,}969 & 3{,}541 & 0.29 & 1.013 \\
+WA* / Euclidean & 524 & 187{,}432 & 258{,}760 & 9{,}487 & 752 & 0.04 & 1.008 \\
+WA* / Haversine & 524 & 187{,}432 & 258{,}760 & 9{,}708 & 782 & 0.06 & 1.008 \\
+WA* / Risk-weighted & 455 & 201{,}761 & 268{,}836 & 25{,}257 & 2{,}260 & 0.13 & 1.013 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Biasing the heuristic toward hazard avoidance ($h_W$) harms greedy best-first search on both search effort and path quality (Figure~\ref{fig:a1-greedy}), but under A* it instead cuts expansions by 24\% (50,969 vs.\ 67,049), trading away the optimality guarantee and a much larger peak frontier. On the selected origin--destination pair, weighted A* with the Euclidean heuristic used the fewest expansions among configurations returning a route within 10\% of the UCS distance (Figure~\ref{fig:a1-risk}). The effective branching factors are close to one because the observed expansion counts are small relative to the long solution depths under the regular-tree approximation (Table~\ref{tab:a1-all}). They should not be interpreted as estimates of the physical road graph's branching factor.
+
+A post hoc evaluator sensitivity check holds the path found by A* with the Euclidean heuristic fixed and sweeps the simulator's risk weight $\alpha\in\{0.5,1.5,3.0\}$ from Equation~\eqref{eq:a1-actual-cost}; $G_a$ scales from 198,225\,m to 291,699\,m (Table~\ref{tab:a1-alpha}). Because $\alpha$ is used only by the post hoc evaluator, changing it alters $G_a$ but not the route, $G_d$, or expansion count.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Simulator-only sweep over the risk weight $\alpha$, with the path found by A* with the Euclidean heuristic (and hence $G_d$) held fixed.}
+\label{tab:a1-alpha}
+\begin{tabular}{rrr}
+\toprule
+$\alpha$ & $G_d$ (m) & $G_a$ (m) \\
+\midrule
+0.5 & 173,686 & 198,225 \\
+1.5 & 173,686 & 235,615 \\
+3.0 & 173,686 & 291,699 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.47\textwidth]{figures/a1_ucs.png}
+  \includegraphics[width=0.47\textwidth]{figures/a1_astar_euclidean.png}
+  \caption{UCS (left) and A* with the Euclidean heuristic (right) return the same minimum-distance path (173,686\,m, 399 hops); A* reaches it with far fewer expansions. Expansion order shown in viridis with safety/hazard points of interest overlaid.}
+  \label{fig:a1-astar}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.47\textwidth]{figures/a1_bfs.png}
+  \includegraphics[width=0.47\textwidth]{figures/a1_dfs.png}
+  \caption{BFS (left) returns the fewest hops but an approximately 34\% longer path than the minimum-distance path returned by UCS and A* with the Haversine heuristic. DFS (right) snakes for 10,928 hops, about 15$\times$ that same minimum distance, illustrating non-optimality without any heuristic guidance.}
+  \label{fig:a1-uninformed}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.47\textwidth]{figures/a1_greedy_euclidean.png}
+  \includegraphics[width=0.47\textwidth]{figures/a1_greedy_risk_weighted.png}
+  \caption{Greedy best-first search with the Euclidean heuristic (left) versus the inadmissible risk-weighted heuristic (right): biasing away from hazard grows the path from 567 to 973 hops and increases the number of expansions approximately elevenfold on this origin--destination instance.}
+  \label{fig:a1-greedy}
+\end{figure}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.47\textwidth]{figures/a1_astar_risk_weighted.png}
+  \includegraphics[width=0.47\textwidth]{figures/a1_wastar_euclidean.png}
+  \caption{A* with the inadmissible risk-weighted heuristic (left): fewer expansions, but a longer, more circuitous path that bends around regions assigned higher synthetic-risk scores. Weighted A* with $w=1.5$ and the Euclidean heuristic (right): approximately one-seventh as many expansions as plain A* (9,487 vs.\ 67,049) with an 8\% longer path on this instance.}
+  \label{fig:a1-risk}
+\end{figure}
+
+
+\section{Study II: Constraint-Based Allocation Under Synthetic Fuel Scarcity}
+
+\subsection{Problem Formulation}
+The 2026 Bangladesh fuel shortage, including long queues and rationing measures, motivates a synthetic daily station-slot allocation model \citep{aa2026fuelshortage,prothomalo2026queue,bssnews2026limits,dailystar2026fuelpass}. The model does not reproduce weekly histories, fuel inventories, or authentication.
+
+The $N$ vehicles that must refuel on a single crisis day are sampled according to a synthetic vehicle mix loosely informed by Dhaka registration statistics \citep{brta2024registered,tbsvehiclemix2026}: 55\% motorcycles, 30\% cars, 12\% three-wheelers, and 3\% emergency vehicles, the last of which is a modeling choice rather than a reported registration share. The city has $M$ operating stations $\mathcal{S}=\{s_1,\dots,s_M\}$, drawn from OpenStreetMap \texttt{amenity=fuel} nodes \citep{osmWikiFuel}, of which 18 of the 248 returned by an Overpass query over the Dhaka bounding box are selected to create a controlled scarcity scenario; the operating day is split into $T=6$ two-hour slots (06:00 to 18:00), and each station serves a subset of fuel types with 1 to 3 working pumps. One decision variable is assigned per vehicle, $x_v \in \mathcal{S}\times\{0,\dots,T-1\}$, with domain
+\begin{equation}
+D(x_v) = \big\{(s,t) : \mathrm{fuel}(v)\in F(s),\ d(\mathrm{home}(v),s)\le R_v,\ t\in\mathrm{open}(s),\ t\in\mathrm{window}(v)\big\},
+\label{eq:a2-domain}
+\end{equation}
+where $R_v$, the vehicle's willingness-to-drive radius, is drawn uniformly from $[2,5]$\,km. In addition to the unary domain restrictions in Equation~\eqref{eq:a2-domain}, the assignment must satisfy the global station-slot capacity constraint $\big|\{v : x_v=(s,t)\}\big| \le \mathrm{cap}(s,t)$ for every station-slot pair, where $\mathrm{cap}(s,t)$ equals the station's working-pump count in an open slot and zero otherwise. Capacity represents one conservative appointment unit per working pump and slot, not the physical number of eight-minute refuelling operations possible within two hours. The variables also support a constraint-optimization (COP) relaxation minimizing the weighted objective
+\begin{equation}
+\begin{split}
+J(x)={}&\alpha\sum_v d(\mathrm{home}(v),\mathcal{S}(x_v)) + \beta\sum_v w(x_v)\\
+&+ \gamma\sum_{(s,t)}\max(0,n(s,t)-\mathrm{cap}(s,t)) + \delta\sum_{v\in\mathcal{V}^{\text{em}}}(n(x_v)-1)_+,
+\end{split}
+\label{eq:a2-cop}
+\end{equation}
+where $w(x_v)$ is an assignment-order congestion surrogate at the assigned pump, $n(s,t)$ the number of vehicles routed to cell $(s,t)$, $n(x_v)=n(s_v,t_v)$ with $(s_v,t_v)=x_v$ the occupancy of the cell assigned to vehicle $v$, and $\mathcal{V}^{\text{em}}$ the emergency-vehicle subset, with weights $(\alpha,\beta,\gamma,\delta)=(1.0,2.0,25.0,10.0)$. This composite objective $J$ guides min-conflicts by ranking candidate moves both before and after feasibility is reached. The larger overflow weight $\gamma$ strongly discourages violations without imposing lexicographic feasibility. $J$ is a unitless heuristic ranking under the fixed weights, not an operational or economic cost.
+
+\subsection{Methodology}
+Five solvers share the same constraint engine: plain backtracking with a fixed variable and value order; backtracking with minimum-remaining-values (MRV) variable ordering; backtracking with least-constraining-value (LCV) value ordering; backtracking with forward checking, which removes a station-slot pair from every unassigned vehicle's domain (Equation~\eqref{eq:a2-domain}) as soon as it fills and backtracks immediately on a domain wipe-out; and min-conflicts local search \citep{minton1992conflicts}, which starts from a greedy initial assignment and then repeatedly repairs it. Before feasibility, it selects a conflicted vehicle and ranks that vehicle's candidate values first by post-move capacity violations and then by the COP objective $J$. After feasibility, it samples a vehicle from the full fleet and accepts a move only if it strictly reduces $J$ without introducing a capacity violation. The implementation continues accepting strictly improving feasible moves after first reaching feasibility. Problem sizes $N\in\{10,20,30,50,75,100\}$ are tested over 5 random seeds per size under a 10-second wall-clock budget per solver per instance.
+
+For every problem size, the same five generated instances are supplied to all five solvers, using seeds computed as $1000+10N+r$ for $r\in\{0,\dots,4\}$ (e.g.\ seeds 2000--2004 at $N=100$). Fuel stations are drawn from an Overpass query over the Dhaka bounding box $23.65^\circ$--$23.92^\circ$N, $90.32^\circ$--$90.52^\circ$E, returning 248 candidate stations, of which 18 active stations are selected by a single fixed random sample (seed 0) and reused unchanged across every problem size and seed; this constitutes one fixed active-station scenario family with five vehicle-population realizations per problem size. Pump counts are sampled uniformly from $\{1,2,3\}$ per station. Every station supports octane and diesel; CNG is added with probability 0.55, with a fallback that adds CNG to every third station if none of the 18 sampled stations would otherwise support it. Each station closes zero or one of its six daily slots at random. Vehicle home coordinates are sampled uniformly within the bounding box of the 18 active stations' coordinates, and each vehicle's availability window is a contiguous block of two to five of the six daily slots, placed at a uniformly random start. Fuel requirement follows a fixed mapping from vehicle class: motorcycles and cars use octane, three-wheelers use CNG, and emergency vehicles use diesel. The assignment-order congestion surrogate is given by $w(x_v) = (\mathrm{position}-1)\times 8\,\mathrm{min}/\mathrm{pumps}(s)$ where position is the position of a vehicle in the internal assignment ordering of a solution and emergency vehicles do not get a real queue priority but rather only through a separate $\delta$ term in Equation~\eqref{eq:a2-cop}, which is an emergency-vehicle crowding preference. The position is solver dependent so that $w(x_v)$ is not a predicted duration of the queue but a synthetic within slot ranking proxy. Within $J$, distance is measured in kilometers and the congestion surrogate in minutes; neither term is rescaled before being combined through the weights $(\alpha,\beta,\gamma,\delta)$.
+
+Min-conflicts runs for up to 20,000 repair steps or a 10-second wall-clock budget, whichever comes first, with no restart policy. It is initialized by assigning each vehicle, in turn, to the domain value that minimizes, in order, the capacity overflow it would create and then its travel distance to the station; during repair, a candidate value only replaces the current best on a strict improvement in $J$, so exact ties are resolved by the first candidate in the shuffled evaluation order. A ``method-specific candidate evaluation'' counts one attempted (variable, value) trial for the four systematic solvers, including trials made before a run times out or fails to find a solution; for min-conflicts it instead counts one candidate-value evaluation during greedy initialization or repair, so it is a proxy for search effort rather than a tree-search node count. These counts are comparable within the four backtracking configurations but not directly between backtracking and min-conflicts, since the two families count structurally different operations; wall-clock time is therefore the principal cross-family computational metric.
+
+\subsection{Results and Discussion}
+
+Plain backtracking is the first to fail (with an average domain size of around 40 values per variable): success drops to 0.40 at $N=50$ and to 0 by $N=75$ (Table~\ref{tab:a2-success}). MRV is the strongest systematic backtracking configuration tested, expanding only $\sim$1,759 nodes at $N=100$ against backtracking's 9.35 million, and solves every size at 100\% success in under half a second on average. LCV helps at intermediate sizes but collapses to 0.20 success at $N=75$ and 0 at $N=100$. Forward checking keeps pace with MRV up to $N=50$ but runs into severe search overhead beyond that size (0.20 success at $N\ge75$); this behavior is consistent with its cell-level pruning being poorly matched to the global capacity constraint.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Success rate: fraction of runs returning a zero-conflict assignment.}
+\label{tab:a2-success}
+\begin{tabular}{lrrrrrr}
+\toprule
+Algorithm & $N=10$ & $N=20$ & $N=30$ & $N=50$ & $N=75$ & $N=100$ \\
+\midrule
+BT + Forward Checking & 1.00 & 1.00 & 1.00 & 1.00 & 0.20 & 0.20 \\
+BT + LCV & 1.00 & 1.00 & 1.00 & 1.00 & 0.20 & 0.00 \\
+BT + MRV & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+Backtracking & 1.00 & 1.00 & 0.80 & 0.40 & 0.00 & 0.00 \\
+Min-Conflicts & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Mean wall-clock time (s) over five instances per problem size, with a 10-second cap per run. Values marked $<0.001$ are measured nonzero times below 1 ms.}
+\label{tab:a2-runtime}
+\begin{tabular}{lrrrrrr}
+\toprule
+Algorithm & $N=10$ & $N=20$ & $N=30$ & $N=50$ & $N=75$ & $N=100$ \\
+\midrule
+BT + Forward Checking & $<0.001$ & $<0.001$ & 0.001 & 0.068 & 8.126 & 8.140 \\
+BT + LCV & $<0.001$ & $<0.001$ & $<0.001$ & 0.001 & 8.003 & 10.003 \\
+BT + MRV & 0.001 & 0.006 & 0.014 & 0.061 & 0.191 & 0.425 \\
+Backtracking & $<0.001$ & $<0.001$ & 2.000 & 6.001 & 10.003 & 10.002 \\
+Min-Conflicts & 1.462 & 1.767 & 1.590 & 1.867 & 1.946 & 1.982 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.47\textwidth]{figures/a2_runtime_vs_size.png}
+  \includegraphics[width=0.47\textwidth]{figures/a2_nodes_vs_size.png}
+  \caption{Mean wall-clock time (left) and method-specific candidate evaluations (right) versus problem size on logarithmic axes. Evaluation counts are comparable within the four backtracking variants but not between backtracking and min-conflicts, so wall-clock time is the main cross-family measure. Shaded bands show one standard deviation over five instances.}  \label{fig:a2-scaling}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.47\textwidth]{figures/a2_travel_vs_size.png}
+  \includegraphics[width=0.47\textwidth]{figures/a2_wait_vs_size.png}
+  \caption{Mean total travel distance (left) and total synthetic wait score (right; a congestion surrogate, not an actual queue time) versus problem size. Both are averaged over successful zero-conflict runs only; a missing point means that no seed succeeded at that size, and a point at 0.20 success reflects one seed. Shaded bands show one standard deviation over successful runs.}   \label{fig:a2-cost}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/a2_cost_vs_size.png}
+  \caption{Mean composite COP objective $J$ versus problem size for all five solvers. Means use successful zero-conflict assignments only, so a point at 0.20 success reflects one seed. Shaded bands show one standard deviation over successful runs. Because $J$ combines kilometers, minutes, and unitless overflow and crowding counts under fixed weights, it is meaningful only for relative comparison on the same instances. Among successful-run means, min-conflicts is lowest at every tested size because it explicitly optimizes $J$ after feasibility.}
+  \label{fig:a2-objective}
+\end{figure}
+
+MRV and min-conflicts (Figures~\ref{fig:a2-scaling}--\ref{fig:a2-cost}) solved all five instances at every tested size. MRV was the strongest systematic backtracking configuration tested. Among successful zero-conflict runs, min-conflicts produced the lowest mean travel distance and the lowest composite objective $J$ (Figure~\ref{fig:a2-objective}), having continued to improve $J$ after first reaching feasibility. The reported min-conflicts runtime includes post-feasibility improvement and should not be interpreted as time to the first zero-conflict assignment. After first reaching feasibility, the implementation continued accepting strictly improving moves until either the 20{,}000-step limit or the 10-second wall-clock limit was reached. Plain backtracking failed first; LCV and forward checking also degraded at larger sizes.
+
+\section{Study III: Ant Colony Routing Under Time-Dependent Road Feasibility}
+
+\subsection{Problem Formulation}
+Recent California wildfires and evacuation simulations demonstrate the operational importance of route and departure-time decisions \citep{ap2026palisadeseaton,wong2021berkeley}. This study evaluates a simplified synthetic abstraction of the same problem: a rural road network at the wildland-urban interface is represented as an 11$\times$11 grid of intersections with random positional jitter and 22\% of segments deleted at random, producing the dead ends and forced detours of a real road system. A wildfire ignites upwind and spreads outward according to a cosine-modulated directional arrival-time field: the arrival time at a point $\mathbf{p}$ is
+\begin{equation}
+t_{\text{fire}}(\mathbf{p}) = \frac{\lVert \mathbf{p}-\mathbf{q}\rVert}{r(\mathbf{p})}, \qquad r(\mathbf{p}) = r_0\big(1 + W\cos\theta(\mathbf{p})\big),
+\label{eq:a3-fire-arrival}
+\end{equation}
+where $\mathbf{q}$ is the ignition point, $r_0$ the still-air spread rate, $W\in[0,1]$ the wind strength, and $\theta$ the angle between the spread direction and the wind, so the front moves up to $(1+W)\times$ faster downwind and slower upwind. Six neighborhood groups each need to drive from their home intersection to one of four shelters. A group may start crossing a road $(u,v)$ at time $t$ only if it clears both endpoints before the fire reaches them, per Equation~\eqref{eq:a3-fire-arrival}, with a safety margin $m$: $t \le t_{\text{fire}}(u)-m$ and $t+t_{uv}\le t_{\text{fire}}(v)-m$. The objective is to minimize the total penalized evacuation time $T = \sum_{\text{groups}}(\text{arrival time at shelter}) + P\cdot(\text{number of trapped groups})$. The trap penalty is set to $P=8$ hours so that a trapped group costs substantially more than an ordinary routing delay in the scenarios tested; this is a modeling choice, not a formal lexicographic guarantee.
+
+\subsection{Methodology}
+An ant proposes a full evacuation plan, one ordered route per group, built hop by hop under the feasibility rule above. Every accepted edge traversal is locally feasible, although a partially constructed route may still reach a dead end and be scored as trapped: an ant that reaches such a state reports its group trapped and incurs the trapped-group penalty. At intersection $i$, an ant chooses the next feasible intersection $j$ with probability
+\begin{equation}
+p_{ij} = \frac{\tau_{ij}^{\alpha}\,\eta_{ij}^{\beta}}{\sum_{k\in\mathcal{F}}\tau_{ik}^{\alpha}\,\eta_{ik}^{\beta}}, \qquad \eta_{ij} = \frac{1}{t_{ij}+\hat t_{\text{shelter}}(j)},
+\label{eq:a3-aco-prob}
+\end{equation}
+where $\tau_{ij}$ is the colony's pheromone memory on road $(i,j)$, $\eta_{ij}$ rewards roads that are quick to drive and point toward a shelter, $\mathcal{F}$ is the feasible set of neighbors still reachable ahead of the fire, and $\alpha,\beta$ weight memory against instinct \citep{dorigo1996antsystem}. After every iteration, pheromone evaporates on all roads and is deposited only on successful routes contained in the iteration-best plan $\pi^\star$, i.e.\ routes that reach a shelter; a group's partial route left behind when it is trapped receives no deposit,
+\begin{equation}
+\tau_{ij}\leftarrow(1-\rho)\tau_{ij} + \frac{Q}{L}\,\mathbb{1}[(i,j)\in\pi^\star],
+\label{eq:a3-pheromone-update}
+\end{equation}
+so a faster iteration-best plan (smaller total penalized time $L$) reinforces itself more strongly \citep{stutzle2000maxmin}; this is an iteration-best deposit rule, distinct from the incumbent best plan across all 120 iterations, which is tracked separately and returned as the final routing. Table~\ref{tab:a3-params} lists the run's parameters. Every generated scenario is checked for solvability by a fire-aware Dijkstra feasibility check before use; this check is used only as a scenario-solvability filter, not as a reported objective baseline, so the experiment evaluates ACO relative to two constructive heuristics but does not establish optimality or superiority over exact time-dependent routing. Fire-aware greedy is the primary information-matched comparator. Fire-blind shortest path is a contextual baseline that plans without fire information and is checked only afterward. Neither method replans after reaching an infeasible continuation. The greedy router takes, at every intersection, the feasible neighbor minimizing edge travel time plus straight-line-distance time to the nearest shelter, without committing to a single target shelter in advance; the fire-blind baseline runs a one-shot Dijkstra search by travel time from each origin to its nearest shelter, checked hop by hop against the fire only afterward. Shelters carry no capacity limit, so any number of groups may be routed to the same shelter. The six groups are accordingly a multi-origin collection of independently constructed evacuation routes evaluated under a shared additive objective, not a coupled multi-agent traffic system: there is no road-capacity competition, no shared-road congestion, no shelter capacity, and no departure-time coordination among groups, and these interactions are outside the scope of the implemented abstraction.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Simulation and algorithm parameters.}
+\label{tab:a3-params}
+\begin{tabular}{llr}
+\toprule
+Role & Parameter & Value \\
+\midrule
+Map & Grid size / spacing / roads removed & 11$\times$11 / 3.0\,km / 22\% \\
+Map & Positional jitter & 0.55 \\
+Map & Driving speed & 40\,km/h \\
+Fire & Still-air spread / wind factor $W$ & 6\,km/h / 0.65 (fixed) \\
+Evacuation & Groups / shelters / safety margin & 6 / 4 / 0.12\,h ($\approx$7\,min) \\
+Evacuation & Failure (trap) penalty $P$ & 8\,h \\
+ACO & Ants / iterations / $\alpha,\beta,\rho,Q$ & 40 / 120 / 1.0, 3.0, 0.15, 10.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Among the wind parameters, $W=0.65$ is fixed and only the direction $\theta\sim\mathrm{Uniform}(0,2\pi)$ is resampled (Table~\ref{tab:a3-params}); the road network, ignition point, origins, and shelters are also regenerated for each scenario. The resampled quantities are intersection coordinates jittered by independent $\mathcal{N}(0, 0.55^2)$ noise per dimension, candidate road segments independently dropped with probability 0.22, an ignition point placed a fixed distance upwind of the map center along $\theta$ plus independent Gaussian jitter, and six origins and four shelters each drawn uniformly without replacement from, respectively, the earliest-threatened and safest bands of nodes by fire-arrival time.
+
+\subsection{Results and Discussion}
+
+ACO returns a feasible plan with a total penalized objective of 5.02 group-hours. The best-so-far objective reached its final observed value by iteration 43 of 120 (Table~\ref{tab:a3-results}, Figure~\ref{fig:a3-convergence}). Both baselines lose at least one group under the identical feasibility rule: greedy gets stuck in dead-end pockets whose exits the fire closes before it commits to a direction, and the fire-blind method selects a route containing a segment that is already unsafe when reached, causing the route to terminate and the group to be recorded as trapped.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Penalized objective (a sum of arrival times plus trap penalties, not an elapsed evacuation duration), demonstration scenario (seed 19, 121 intersections, 174 segments).}
+\label{tab:a3-results}
+\begin{tabular}{lrr}
+\toprule
+Method & Penalized objective (group-h) & ACO reduction relative to baseline \\
+\midrule
+ACO (this work) & 5.020 & --- \\
+Fire-aware greedy & 18.956 & 73.5\% \\
+Fire-blind shortest path & 11.715 & 57.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/a3_evacuation_map.png}
+  \caption{The ACO evacuation plan. Warm contour bands show the directionally stretched fire-arrival field, the red X is the ignition, blue triangles are origins, green squares are shelters, and the six colored routes are the six groups' plans.}
+  \label{fig:a3-map}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/a3_convergence.png}
+  \caption{ACO convergence on the demonstration scenario. Left: the best-so-far penalized objective falls below the fire-aware greedy and fire-blind baseline values during the early iterations. Right: the iteration-best objective shows the variability of individual search rounds, while the best-so-far trajectory reaches its final observed value by iteration 43.}
+  \label{fig:a3-convergence}
+\end{figure}
+
+Across 15 resampled scenarios, ACO obtained 3.536$\pm$0.884 penalized group-hours and fire-aware greedy obtained 12.176$\pm$13.699, reported as mean $\pm$ standard deviation. Across these 15 paired scenarios, a two-sided Wilcoxon signed-rank test produced $p\approx0.00043$. The test statistic, effect size, and whether an exact or asymptotic calculation was used were not retained. Because each scenario contains one stochastic ACO run, the comparison combines instance and solver variation; no confidence interval is reported. The fixed trap penalty amplifies the variance associated with penalty-bearing failures. The experiment does not isolate the effects of pheromone, population diversity, and heuristic guidance. The number of scenarios in which each method trapped a group was not separately retained, so no claim is made about a lower trapping frequency for ACO.
+
+\section{Study IV: Model-Based and Model-Free Control Under Stochastic Dynamics}
+
+\subsection{Problem Formulation}
+The environment is a $7\times10$ grid; the agent starts at $(3,0)$ and must reach the goal $(3,7)$ using four actions (up, down, left, right), each moving one cell and clipped at the grid edge. Wind strength is read from the column the agent occupies before the move, i.e.\ the state's own column rather than the destination column: columns 0 to 2 and 9 carry no wind, columns 3 to 5 and 8 carry mean wind 1, and columns 6 and 7 carry mean wind 2. 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\textwidth]{figures/a4_environment.png}
+  \caption{The Stochastic Windy Gridworld. Darker columns carry stronger mean wind; the actual strength on any single pass varies by $\pm1$.}
+  \label{fig:a4-env}
+\end{figure}
+In a windy column the actual push on any single pass is stochastic ($w-1$, $w$, or $w+1$, each with probability $\tfrac13$), so the state $(row, col)$ remains genuinely Markov, since the wind is drawn independently every time the agent passes through a column. The environment has 69 non-terminal states plus an absorbing goal, four actions, and a reward of $-1$ on every transition including the one that reaches the goal.
+
+\subsection{Methodology}
+Because the custom Gymnasium environment exposes no transition table, the model $P(s'\mid s,a)$ is derived analytically from the wind's known per-column probabilities. The transition model is derived for value iteration; Q-learning interacts only with the simulator. Value iteration then applies the Bellman optimality equation of Equation~\eqref{eq:bellman} as a synchronous update rule, initializing $V_0(s)=0$ and repeating
+\begin{equation}
+V_k(s) = \max_a \sum_{s'}P(s'\mid s,a)\big[R(s,a,s')+\gamma V_{k-1}(s')\big]
+\label{eq:a4-vi-update}
+\end{equation}
+until the largest change across all states drops below a threshold $\theta$; it is run with $\gamma=0.99$ and $\theta=10^{-10}$. Q-learning instead samples environment interactions from the simulated Gymnasium environment with an $\varepsilon$-greedy behavior policy and updates $Q(s,a)$ after every step \citep{sutton2018rl} via
+\begin{equation}
+Q(s,a)\leftarrow Q(s,a)+\alpha\big[r+\gamma\max_{a'}Q(s',a')-Q(s,a)\big];
+\label{eq:a4-ql-update}
+\end{equation}
+it is trained for 50,000 episodes (a single run, seed 42) with $\alpha=0.1$, $\gamma=0.99$, and $\varepsilon$ decaying multiplicatively as $\varepsilon_t=\max(0.02,\,1.0\times0.9999^{\,t})$ per episode $t$. No exploring starts were used. All states were visited at least once during training; this observation does not establish uniform state--action coverage or asymptotic convergence.
+
+In this environment the discount factor does more than control convergence speed. With reward $-1$ per step, the discounted return for reaching the goal in $T$ steps is $-\tfrac{1-\gamma^{T}}{1-\gamma}$, decreasing and convex in the step count $T$ (equivalently, the accumulated cost $\tfrac{1-\gamma^{T}}{1-\gamma}$ is increasing and concave in $T$). In the corresponding deterministic constant-step-cost formulation, each fixed policy induces a fixed completion time $T$, so changing $\gamma$ changes the value scale and convergence behavior but not the ranking of fixed path lengths, since every $\gamma \in (0,1)$ preserves the same ordering over $T$. Here the wind makes $T$ a random variable, so a policy's value is $\mathbb{E}\!\big[{-}\tfrac{1-\gamma^{T}}{1-\gamma}\big] = -\tfrac{1-\mathbb{E}[\gamma^{T}]}{1-\gamma}$. By Jensen's inequality this depends on the whole distribution of $T$ through $\mathbb{E}[\gamma^{T}]$, not its mean alone, so $\gamma$ sets how heavily the tail of the step-count distribution is weighted and can change which policy is optimal. Section 6.3 confirms this in practice: at $\gamma=0.7$, the policy differs substantially from the $\gamma=0.99$ reference policy.
+
+\subsection{Results and Discussion}
+Value iteration averaged approximately 20.53 steps over 5,000 rollouts, and Q-learning averaged approximately 20.53 steps over a separate 5,000-rollout batch: the two policies produced numerically similar mean episode lengths in separate evaluation batches, an unpaired comparison with no retained uncertainty interval. Their greedy actions agreed in 61 of 69 states (Figure~\ref{fig:a4-policy}). Disagreements were concentrated in low-margin states; uneven state--action sampling may also have contributed, so exact-action agreement should not be interpreted as equivalent policy-value recovery. 64 of 69 states have a best-action margin of at least 0.1, with a median margin of 0.83 (Figure~\ref{fig:a4-margin}). Because the optimum is sharply peaked in most states, a state's greedy action is well-determined there, and the numerically similar rollout behavior is consistent with disagreements falling in the few near-tied states.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/a4_policy_agreement.png}
+  \caption{Per-state greedy action: green cells agree between value iteration and Q-learning, and red non-terminal cells disagree; the absorbing goal, marked with a green \textsf{G}, is excluded from the 69 policy states and is not a disagreement despite its cell shading (61 of 69 states agree).}
+  \label{fig:a4-policy}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/a4_action_margin.png}
+  \caption{Distribution of the value-iteration best-action margin $Q(s,a^\star)-Q(s,a_{\text{2nd best}})$ across the 69 non-terminal states. The optimum is sharply peaked rather than flat: 64 of 69 states have a margin of at least 0.1 (median 0.83, dashed line). Only a few states have small margins. In these states, alternative actions have similar model-based values, making exact greedy-action agreement a particularly stringent comparison metric.}
+  \label{fig:a4-margin}
+\end{figure}
+
+The discount-factor sweep (Figure~\ref{fig:a4-gamma}) confirms the theoretical point from Section 6.2: lowering $\gamma$ changes the policy itself, beyond merely the speed of finding it. Mean episode length is flat at about 20.37 steps for $\gamma\ge0.95$, but rises to 21.37 steps at $\gamma=0.9$ (6/69 states switch) and 27.75 steps at $\gamma=0.7$ (13/69 states switch) (the sweep uses a separate 3,000-rollout batch per $\gamma$, explaining the small difference from the headline $\gamma=0.99$ mean). Once the wind's stochastic branching is in play, a smaller $\gamma$ discounts distant steps more heavily, so value iteration settles on a policy that is optimal for its smaller-$\gamma$ objective but worse by the plain step-count metric; this effect would not arise in the corresponding deterministic, constant-step-cost shortest-path formulation. At $\gamma=1$, the undiscounted episodic return is $-T$; the usual discounted Bellman-contraction guarantee no longer applies.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{figures/a4_gamma_sweep.png}
+  \caption{Value-iteration discount-factor sweep. Left: mean episode length over a separate 3,000-rollout batch per $\gamma$; relative to the $\gamma=0.99$ reference policy, 6 of 69 greedy actions differ at $\gamma=0.9$ and 13 differ at $\gamma=0.7$. Right: the start-state value under each discounted objective; these values change in scale with $\gamma$ and should not be interpreted as raw expected step counts.}
+  \label{fig:a4-gamma}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.32\textwidth]{figures/a4_theta_sweep.png}
+  \includegraphics[width=0.32\textwidth]{figures/a4_alpha_sweep.png}
+  \includegraphics[width=0.32\textwidth]{figures/a4_epsilon_sweep.png}
+  \caption{Hyperparameter sweeps. Left: across the six tested thresholds, value iteration's stopping threshold $\theta$ traded additional sweeps for numerical precision without changing the extracted greedy policy. Center and right: the Q-learning curves are 100-episode moving averages, and each curve represents one seed. In the reported single-seed trajectories, smaller learning rates $\alpha$ were associated with a lower, steadier moving-average plateau, while slower exploration decay reached a lower moving-average step count later.}
+  \label{fig:a4-hyperparam}
+\end{figure}
+Tightening $\theta$ from $10^{-2}$ to $10^{-12}$ increased value-iteration sweeps from 36 to 136 without changing the greedy policy. In the single-seed Q-learning sweeps, smaller $\alpha$ values were associated with a lower, steadier moving average in the reported run, while slower exploration decay showed a lower moving-average step count later in that run. Each setting used one 50,000-episode run with seed 42, so these are trajectory-level observations from a single seed, not a claim that either setting is generally preferable.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Model-based vs. model-free on the Stochastic Windy Gridworld; rollout means are from separate rollout batches, and no uncertainty interval was retained.}
+\label{tab:a4-summary}
+\begin{tabularx}{\textwidth}{@{}p{3.6cm}XX@{}}
+\toprule
+ & Value Iteration (model-based) & Q-Learning (model-free) \\
+\midrule
+Needs a transition model & Yes, derived analytically & No transition table; simulator transitions only \\
+Simulator interactions during planning & No sampled transitions; expectations were evaluated using the analytically specified transition model & 50,000 training episodes \\
+Policy recovery & Numerically converged model-based reference policy at $\theta=10^{-10}$ & 88.4\% exact greedy-action agreement with the VI reference policy \\
+Rollout performance & 20.53 avg.\ steps (5,000 rollouts, seed 1) & 20.53 avg.\ steps (5,000 rollouts, seed 3, separate evaluation batch) \\
+Sensitive to $\gamma$'s exact value & Policy changed across the tested $\gamma$ values & Q-learning sensitivity across $\gamma$: not evaluated in a separate Q-learning sweep \\
+Sensitive to threshold $\theta$ & No policy change observed across the six tested $\theta$ values & Not applicable \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\section{Cross-Study Synthesis and Limitations}
+\subsection{Cross-Study Synthesis}
+Across the four studies, theoretical guarantees were most informative when the implemented objective, representation, and computational budget matched their assumptions. The Dhaka routing case showed that a risk-biased heuristic can reduce expansions while weakening cost optimality; the allocation case showed how a fixed time limit separates theoretical completeness from observed solver success; the wildfire case showed that locally feasible choices can still fail under expiring road availability; and the gridworld case showed that finite-sample Q-learning agreement with value iteration can coexist with policy differences. These are qualitative cross-case patterns, since search expansions, CSP candidate evaluations, ACO iterations, and Q-learning episodes measure different operations.
+
+\subsection{Limitations and Scope}
+The evidence is diagnostic rather than operational. Study I uses one OpenStreetMap snapshot and one origin--destination pair; Study II uses one active-station scenario family; Study III uses simplified fire dynamics, independent routes, and one ACO run per scenario; and Study IV uses limited seeds with separate evaluation batches. The findings should therefore not be read as calibrated estimates, general superiority claims, or evidence of algorithmic convergence.
+
+\section{Conclusions}
+Across the four studies, applied modeling choices determined which classical guarantees remained useful. On the fixed Dhaka route, A* with the Haversine heuristic matched UCS with fewer expansions; the risk-biased heuristic reduced A* expansions but lost the optimality guarantee and worsened greedy search, while weighted A* with the Euclidean heuristic used the fewest expansions among configurations returning a route within 10\% of the UCS distance on that instance. In the synthetic fuel-allocation family, MRV and min-conflicts solved all tested instances, and min-conflicts continued improving the composite objective after feasibility while the other configurations degraded with scale. Across 15 wildfire scenarios, ACO reduced penalized group-hours relative to fire-aware greedy, although simplified fire dynamics and one ACO run per scenario limit generalization. In the stochastic gridworld, Q-learning agreed with value iteration on 61 of 69 greedy actions and produced a numerically similar rollout mean in a separate evaluation batch; the value-iteration discount-factor sweep showed that a random completion horizon can change the optimal policy. Across these case studies, classical guarantees were most informative when the implemented objective, representational assumptions, and computational budget closely matched the conditions under which those guarantees apply. Broader route and allocation resampling, together with repeated stochastic runs, are the clearest next steps.
+
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
